@@ -1,0 +1,36 @@
+{
+  "name": "stream-view",
+  "title": "Stream View",
+  "description": "",
+  "author": [
+    "sPOiDar"
+  ],
+  "version": "0.0.0",
+  "minimumCoreVersion": "0.8.6",
+  "compatibleCoreVersion": "0.8.6",
+  "esmodules": [
+    "modules/stream_view.js"
+  ],
+  "styles": [
+    "styles/stream_view.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "socket": true,
+  "dependencies": [
+    {
+      "name": "lib-wrapper"
+    },
+    {
+      "name": "socketlib"
+    }
+  ],
+  "url": "https://github.com/sPOiDar/fvtt-module-stream-view",
+  "manifest": "https://github.com/sPOiDar/fvtt-module-stream-view/raw/master/module.json",
+  "download": "https://github.com/sPOiDar/fvtt-module-stream-view/releases/download/v0.0.0/stream-view-v0.0.0.zip"
+}

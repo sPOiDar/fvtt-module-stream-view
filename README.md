@@ -1,0 +1,34 @@
+# Foundry VTT - Stream View
+
+![Release](https://github.com/sPOiDar/fvtt-module-stream-view/workflows/Release/badge.svg)
+
+This module provides a minimal UI view with automated camera work, ideal for streaming or recording games, without all the GM clutter that running a game entails. It works by assigning a non-player user to the module, and when a browser is logged in as that user, Foundry will present a minimal UI, with the following functions:
+
+- Multiple camera tracking modes:
+  - _Automatic_ camera mode tracks player character tokens in the scene, adjusting the camera focus to keep them in view.
+  - _Directed_ camera mode tracks the GM's view at all times.
+- In _Automatic_ mode, during combat, the current combatant's token, targets and measured templates are tracked by the camera
+- Optionally, the view of the current combatant's controlling user can be tracked during combat.
+- If using in-game voice/video chat, tokens for the currently speaking users will be focussed, and a speaking indicator will be shown above their token (GMs will use their currently selected token, if any).
+- Shared popouts (e.g. journal notes/images shown to players) may be auto-closed after a timeout. Alternatively, they may be closed manually from the Stream View toolbar.
+- Camera mode may be toggled dynamically from the Stream View toolbar.
+
+## Setup
+
+- Create a user that will be used to stream your games, we'll call that user `Stream`.
+- Assign the Stream user `Observer` permissions for all player actors, this will ensure that the stream view shares vision with your party's tokens.
+- Select the Stream user under Foundry VTT `Settings` -> `Configure Settings` -> `Module Settings` -> `Stream View` -> `Stream User`, and save.
+- Log in with your Stream user in a new browser session, for recording.
+
+### OBS Studio
+
+- Add a browser source that points to your Foundry installation's web interface.
+- Right-click on the browser source and choose 'Interact', then log in as your Stream user.
+- ???
+- Profit
+
+## TODO
+
+- Record some demonstration videos to show off the features.
+- Add auto-camera viewport preview to the Stream View toolbar for GMs, requires implementing a fully functional layer and Document/DocumentConfig/etc based on Drawing.
+- See if there's any sane way to do Discord voice activity detection, unfortunately there's no tidy solution for this, particularly for hosted Foundry.
