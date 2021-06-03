@@ -1,7 +1,7 @@
 {
   "name": "stream-view",
   "title": "Stream View",
-  "description": "",
+  "description": "This module provides a minimal UI view with automated camera work, ideal for streaming or recording games.",
   "author": [
     "sPOiDar"
   ],
