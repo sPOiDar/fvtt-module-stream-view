@@ -1,6 +1,8 @@
 # Foundry VTT - Stream View
 
 ![Release](https://github.com/sPOiDar/fvtt-module-stream-view/workflows/Release/badge.svg)
+![Forge Users](https://img.shields.io/badge/dynamic/json?color=blue&label=Forge%20Users&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fstream-view)
+![Foundry Version](https://img.shields.io/badge/dynamic/json?color=blue&label=Foundry%20Version&prefix=v&query=%24.compatibleCoreVersion&url=https%3A%2F%2Fgithub.com%2FsPOiDar%2Ffvtt-module-stream-view%2Fraw%2Fmaster%2Fmodule.json)
 
 This module provides a minimal UI view with automated camera work, ideal for streaming or recording games, without all the GM clutter that running a game entails. It works by assigning a non-player user to the module, and when a browser is logged in as that user, Foundry will present a minimal UI, with the following functions:
 
