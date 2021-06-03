@@ -5,7 +5,7 @@
   "author": [
     "sPOiDar"
   ],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minimumCoreVersion": "0.8.6",
   "compatibleCoreVersion": "0.8.6",
   "esmodules": [
@@ -32,5 +32,5 @@
   ],
   "url": "https://github.com/sPOiDar/fvtt-module-stream-view",
   "manifest": "https://github.com/sPOiDar/fvtt-module-stream-view/raw/master/module.json",
-  "download": "https://github.com/sPOiDar/fvtt-module-stream-view/releases/download/v0.1.0/stream-view-v0.1.0.zip"
+  "download": "https://github.com/sPOiDar/fvtt-module-stream-view/releases/download/v0.1.1/stream-view-v0.1.1.zip"
 }
