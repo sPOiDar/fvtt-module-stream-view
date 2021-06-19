@@ -40,6 +40,7 @@ class StreamView {
 			if (!game.settings.get('stream-view', 'show-scene-navigation')) {
 				this.hideHtml(html);
 			}
+			instance.updateScene();
 		});
 		Hooks.on('renderPlayerList', (_app, html) => {
 			if (!game.settings.get('stream-view', 'show-player-list')) {
@@ -457,6 +458,7 @@ class StreamView {
 		this._speakerHistory = new Map();
 		this._popouts = new Map();
 		this._controlledTokenId = null;
+		this._sceneId = null;
 		this._debounceAnimateTo = foundry.utils.debounce(this.animateTo.bind(this), 100);
 	}
 
@@ -1073,6 +1075,31 @@ class StreamView {
 		return canvas.animatePan({x, y, scale, duration});
 	}
 
+	updateScene() {
+		if (!StreamView.isStreamUser) {
+			return;
+		}
+
+		if (this._sceneId !== game.canvas.scene.id) {
+			this._sceneId = game.canvas.scene.id;
+			this.focusUpdate();
+		}
+	}
+
+	updateCombat(active, combat) {
+		this._combatActive = !!active;
+
+		if (active && this._isDirectedCamera && !StreamView.isStreamUser) {
+			this._directedPan({x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x});
+			return;
+		}
+		if (!StreamView.isStreamUser) {
+			return;
+		}
+
+		this.focusCombat(combat);
+	}
+
 	focusUpdate() {
 		if (!StreamView.isStreamUser || !this._isAutoCamera) {
 			return;
@@ -1095,20 +1122,6 @@ class StreamView {
 			tokens = this._playerTokens();
 		}
 		this.animateTo(this._coordBounds(this._tokenCoords(tokens)));
-	}
-
-	updateCombat(active, combat) {
-		this._combatActive = !!active;
-
-		if (active && this._isDirectedCamera && !StreamView.isStreamUser) {
-			this._directedPan({x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x});
-			return;
-		}
-		if (!StreamView.isStreamUser) {
-			return;
-		}
-
-		this.focusCombat(combat);
 	}
 
 	focusCombat(combat) {
