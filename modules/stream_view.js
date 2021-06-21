@@ -1,27 +1,27 @@
-import {SpeechBubbles} from './speech_bubbles.js';
-import {StreamViewLayer} from './layer.js';
+import { SpeechBubbles } from './speech_bubbles.js';
+import { StreamViewLayer } from './layer.js';
 
 class StreamView {
 	static CameraMode = {
 		AUTOMATIC: 'automatic',
 		DIRECTED: 'directed',
-	}
+	};
 	static PopoutIdentifiers = {
 		COMBAT: 'combat',
 		CHAT: 'chat',
-	}
+	};
 	static VoiceVideoSize = {
 		SMALL: 'small',
 		MEDIUM: 'medium',
 		LARGE: 'large',
-	}
+	};
 	static _voiceVideoSizePixels = {
 		[this.VoiceVideoSize.SMALL]: 157,
 		[this.VoiceVideoSize.MEDIUM]: 217,
 		[this.VoiceVideoSize.LARGE]: 277,
-	}
+	};
 	static _unknownUserId = 'unknownUser';
-	static _defaultUserChoices = {[this._unknownUserId]: ''};
+	static _defaultUserChoices = { [this._unknownUserId]: '' };
 
 	static _localizeCameraMode(mode) {
 		return game.i18n.localize(`stream-view.settings.camera-mode.option.${mode}`);
@@ -34,7 +34,9 @@ class StreamView {
 	static start() {
 		const instance = new StreamView();
 		Hooks.once('init', () => this.init(instance));
-		Hooks.once('socketlib.ready', () => instance.socketReady(socketlib.registerModule('stream-view')));
+		Hooks.once('socketlib.ready', () =>
+			instance.socketReady(socketlib.registerModule('stream-view')),
+		);
 		Hooks.on('getSceneControlButtons', (app) => instance._addStreamControls(app));
 		Hooks.on('renderSceneNavigation', (_app, html) => {
 			if (!game.settings.get('stream-view', 'show-scene-navigation')) {
@@ -423,10 +425,12 @@ class StreamView {
 			if (posY < 0) {
 				posY = window.innerHeight + posY;
 			}
-			html.css({left: posX, top: posY, bottom: 'inherit'});
+			html.css({ left: posX, top: posY, bottom: 'inherit' });
 		}
 
-		const streamCamera = html.find(`div[data-user="${game.settings.get('stream-view', 'user-id')}"]`);
+		const streamCamera = html.find(
+			`div[data-user="${game.settings.get('stream-view', 'user-id')}"]`,
+		);
 		if (streamCamera) {
 			streamCamera.hide();
 		}
@@ -464,7 +468,7 @@ class StreamView {
 
 	_coordBounds(coords = []) {
 		if (coords.length === 0) {
-			return {x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x};
+			return { x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x };
 		}
 
 		const padding = {
@@ -507,20 +511,22 @@ class StreamView {
 		const gridPadding = {
 			w: canvas.grid.w * 1.5,
 			h: canvas.grid.h * 1.5,
-		}
+		};
 		const width = maxX - minX;
 		const height = maxY - minY;
 		const ratio = Math.min(
-			((window.innerWidth - padding.left - padding.right - gridPadding.w) / width),
-			((window.innerHeight - padding.top - padding.bottom - gridPadding.w) / height),
+			(window.innerWidth - padding.left - padding.right - gridPadding.w) / width,
+			(window.innerHeight - padding.top - padding.bottom - gridPadding.w) / height,
 		);
 		const maxScale = game.settings.get('stream-view', 'maximum-scale');
 		const minScale = game.settings.get('stream-view', 'minimum-scale');
 		const scale = Math.round(Math.clamped(ratio, minScale, maxScale) * 100) / 100;
-		const x = minX + Math.round((width + ((padding.right - padding.left) / scale)) / 2);
-		const y = minY + Math.round((height + ((padding.bottom - padding.top) / scale)) / 2);
+		const paddingOffsetX = (padding.right - padding.left) / scale;
+		const paddingOffsetY = (padding.bottom - padding.top) / scale;
+		const x = minX + Math.round((width + paddingOffsetX) / 2);
+		const y = minY + Math.round((height + paddingOffsetY) / 2);
 
-		return {x, y, scale};
+		return { x, y, scale };
 	}
 
 	get _isCombatUser() {
@@ -540,11 +546,17 @@ class StreamView {
 	}
 
 	get _isAutoCamera() {
-		return this._cameraMode === StreamView.CameraMode.AUTOMATIC && !(this._combatActive && game.settings.get('stream-view', 'directed-combat'));
+		return (
+			this._cameraMode === StreamView.CameraMode.AUTOMATIC &&
+			!(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
+		);
 	}
 
 	get _isDirectedCamera() {
-		return this._cameraMode === StreamView.CameraMode.DIRECTED || (this._combatActive && game.settings.get('stream-view', 'directed-combat'));
+		return (
+			this._cameraMode === StreamView.CameraMode.DIRECTED ||
+			(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
+		);
 	}
 
 	_directedPan(view) {
@@ -572,7 +584,11 @@ class StreamView {
 		}
 
 		try {
-			await this._socket.executeAsUser('animateTo', game.settings.get('stream-view', 'user-id'), view);
+			await this._socket.executeAsUser(
+				'animateTo',
+				game.settings.get('stream-view', 'user-id'),
+				view,
+			);
 		} catch {
 			return;
 		}
@@ -593,7 +609,10 @@ class StreamView {
 		const tokens = [];
 		const decay = game.settings.get('stream-view', 'speaker-decay');
 		this._speakerHistory.forEach((hist) => {
-			if (hist.current.token && hist.current.isSpeaking || performance.now() - hist.current.last < decay) {
+			if (
+				(hist.current.token && hist.current.isSpeaking) ||
+				performance.now() - hist.current.last < decay
+			) {
 				tokens.push(hist.current.token);
 			}
 		});
@@ -605,7 +624,7 @@ class StreamView {
 		canvas.tokens.placeables.forEach((t) => {
 			if (t.targeted?.size > 0) {
 				let isCurrentTarget = false;
-				combatant.players.forEach((u) => isCurrentTarget ||= t.targeted.has(u));
+				combatant.players.forEach((u) => (isCurrentTarget ||= t.targeted.has(u)));
 				if (isCurrentTarget) {
 					targets.push(t);
 				}
@@ -616,13 +635,15 @@ class StreamView {
 
 	_combatGMTokens() {
 		let targets = [];
-		game.users.filter((u) => u.isGM).forEach((u) => {
-			canvas.tokens.placeables.forEach((t) => {
-				if (t.targeted?.has(u)) {
-					targets.push(t);
-				}
+		game.users
+			.filter((u) => u.isGM)
+			.forEach((u) => {
+				canvas.tokens.placeables.forEach((t) => {
+					if (t.targeted?.has(u)) {
+						targets.push(t);
+					}
+				});
 			});
-		});
 		return targets;
 	}
 
@@ -669,8 +690,8 @@ class StreamView {
 		const coords = [];
 		tokens.forEach((t) => {
 			// Use data.x here to avoid in-flight animated coords
-			coords.push({x: t.data.x, y: t.data.y});
-			coords.push({x: t.data.x + t.width, y: t.data.y + t.height});
+			coords.push({ x: t.data.x, y: t.data.y });
+			coords.push({ x: t.data.x + t.width, y: t.data.y + t.height });
 		});
 		return coords;
 	}
@@ -683,8 +704,8 @@ class StreamView {
 				return;
 			}
 			highlight.geometry?.graphicsData?.forEach((g) => {
-				coords.push({x: g.shape.x, y: g.shape.y});
-				coords.push({x: g.shape.x + g.shape.width, y: g.shape.y + g.shape.height});
+				coords.push({ x: g.shape.x, y: g.shape.y });
+				coords.push({ x: g.shape.x + g.shape.width, y: g.shape.y + g.shape.height });
 			});
 		});
 		return coords;
@@ -701,7 +722,7 @@ class StreamView {
 				if (u.isGM) {
 					return false;
 				}
-				token.actor.testUserPermission(u, "OWNER")
+				token.actor.testUserPermission(u, 'OWNER');
 			});
 		} else {
 			user = game.users.find((u) => u.isGM);
@@ -738,7 +759,7 @@ class StreamView {
 		let token;
 		const hist = this._speakerHistory.get(userId);
 		if (hist && !isSpeaking) {
-			token = this._speakerHistory.get(userId).current.token
+			token = this._speakerHistory.get(userId).current.token;
 			if (hist.current.isSpeaking) {
 				this._speechBubbles.hide(token);
 			}
@@ -747,12 +768,14 @@ class StreamView {
 		if (user.isGM) {
 			token = await this._tokenForGM(userId);
 		} else {
-			token = game.canvas.tokens.placeables.find((t) => t.actor?.hasPlayerOwner && user.character && t.actor.id == user.character.id);
+			token = game.canvas.tokens.placeables.find(
+				(t) => t.actor?.hasPlayerOwner && user.character && t.actor.id == user.character.id,
+			);
 		}
 		if (token && isSpeaking) {
 			this._speechBubbles.show(token);
 		}
-		return token
+		return token;
 	}
 
 	async _isSpeaking(userId, isSpeaking, token) {
@@ -769,7 +792,7 @@ class StreamView {
 
 		const result = {
 			previous: this._speakerHistory.get(userId)?.current,
-			current: {isSpeaking: isSpeaking, token: token, last: performance.now()},
+			current: { isSpeaking: isSpeaking, token: token, last: performance.now() },
 		};
 		this._speakerHistory.set(userId, result);
 		if (!isSpeaking) {
@@ -815,7 +838,7 @@ class StreamView {
 					icon: 'far fa-window-restore',
 					onClick: () => this._sendClosePopouts(),
 				},
-			]
+			],
 		});
 	}
 
@@ -830,10 +853,10 @@ class StreamView {
 		try {
 			await this._socket.executeAsUser('closePopouts', game.settings.get('stream-view', 'user-id'));
 		} catch {
-			ui.notifications.warn("Could not close Stream View popouts (user not connected?)");
+			ui.notifications.warn('Could not close Stream View popouts (user not connected?)');
 			return;
 		}
-		ui.notifications.info("Stream View popouts closed");
+		ui.notifications.info('Stream View popouts closed');
 	}
 
 	async _toggleCameraMode() {
@@ -849,7 +872,11 @@ class StreamView {
 			targetMode = StreamView.CameraMode.DIRECTED;
 		}
 		try {
-			await this._socket.executeAsUser('setCameraMode', game.settings.get('stream-view', 'user-id'), targetMode);
+			await this._socket.executeAsUser(
+				'setCameraMode',
+				game.settings.get('stream-view', 'user-id'),
+				targetMode,
+			);
 		} catch {
 			ui.notifications.warn(`Stream View camera mode could not be updated (user not connected?)`);
 			return;
@@ -857,9 +884,15 @@ class StreamView {
 
 		this._cameraMode = targetMode;
 		if (targetMode === StreamView.CameraMode.DIRECTED) {
-			this._directedPan({x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x});
+			this._directedPan({
+				x: canvas.stage.pivot.x,
+				y: canvas.stage.pivot.y,
+				scale: canvas.stage.scale.x,
+			});
 		}
-		ui.notifications.info(`Stream View camera mode is now ${StreamView._localizeCameraMode(this._cameraMode)}`);
+		ui.notifications.info(
+			`Stream View camera mode is now ${StreamView._localizeCameraMode(this._cameraMode)}`,
+		);
 	}
 
 	_setCameraMode(mode) {
@@ -924,12 +957,17 @@ class StreamView {
 		const panelSize = 300;
 
 		const rtcSettings = game.settings.get('core', 'rtcWorldSettings');
-		if (rtcSettings.mode !== AVSettings.AV_MODES.DISABLED && game.settings.get('stream-view', 'show-voice-video')) {
+		if (
+			rtcSettings.mode !== AVSettings.AV_MODES.DISABLED &&
+			game.settings.get('stream-view', 'show-voice-video')
+		) {
 			let pixels = game.settings.get('stream-view', 'voice-video-position-y');
 			if (pixels < 0) {
 				padding.bottom += pixels * -1;
 			} else {
-				padding.top += pixels + StreamView._voiceVideoSizePixels[game.settings.get('stream-view', 'voice-video-size')];
+				padding.top +=
+					pixels +
+					StreamView._voiceVideoSizePixels[game.settings.get('stream-view', 'voice-video-size')];
 			}
 		}
 
@@ -965,23 +1003,27 @@ class StreamView {
 	ready() {
 		if (!game.modules.get('lib-wrapper')?.active) {
 			if (game.user.isGM) {
-				ui.notifications.error("Module stream-view requires the 'lib-wrapper' module. Please install and activate it.");
+				ui.notifications.error(
+					"Module stream-view requires the 'lib-wrapper' module. Please install and activate it.",
+				);
 			}
 			return;
 		}
 		if (!game.modules.get('socketlib')?.active) {
 			if (game.user.isGM) {
-				ui.notifications.error("Module stream-view requires the 'socketlib' module. Please install and activate it.");
+				ui.notifications.error(
+					"Module stream-view requires the 'socketlib' module. Please install and activate it.",
+				);
 			}
 			return;
 		}
 
 		if (StreamView.isStreamUser && !game.settings.get('stream-view', 'show-logo')) {
-			$('img#logo').hide()
+			$('img#logo').hide();
 		}
 
 		// Hack around needing to register settings in init, when data is not yet available.
-		game.users.forEach((v) => StreamView._defaultUserChoices[v.id] = v.name);
+		game.users.forEach((v) => (StreamView._defaultUserChoices[v.id] = v.name));
 		game.settings.settings.get('stream-view.user-id').choices = StreamView._defaultUserChoices;
 		const defaultPadding = this._defaultPadding(false);
 		const defaultCombatPadding = this._defaultPadding(true);
@@ -989,10 +1031,13 @@ class StreamView {
 		game.settings.settings.get('stream-view.padding-right').default = defaultPadding.right;
 		game.settings.settings.get('stream-view.padding-top').default = defaultPadding.top;
 		game.settings.settings.get('stream-view.padding-bottom').default = defaultPadding.bottom;
-		game.settings.settings.get('stream-view.padding-combat-left').default = defaultCombatPadding.left;
-		game.settings.settings.get('stream-view.padding-combat-right').default = defaultCombatPadding.right;
+		game.settings.settings.get('stream-view.padding-combat-left').default =
+			defaultCombatPadding.left;
+		game.settings.settings.get('stream-view.padding-combat-right').default =
+			defaultCombatPadding.right;
 		game.settings.settings.get('stream-view.padding-combat-top').default = defaultCombatPadding.top;
-		game.settings.settings.get('stream-view.padding-combat-bottom').default = defaultCombatPadding.bottom;
+		game.settings.settings.get('stream-view.padding-combat-bottom').default =
+			defaultCombatPadding.bottom;
 
 		this._cameraMode = game.settings.get('stream-view', 'camera-mode');
 		this._combatActive = StreamView.isCombatActive(game.combat);
@@ -1018,20 +1063,38 @@ class StreamView {
 		if (game.settings.get('core', 'chatBubblesPan')) {
 			game.settings.set('core', 'chatBubblesPan', false);
 		}
-		game.webrtc.settings.set('client', 'hidePlayerList', !game.settings.get('stream-view', 'show-player-list'));
-		game.webrtc.settings.set('client', 'dockSize', game.settings.get('stream-view', 'voice-video-size'));
+		game.webrtc.settings.set(
+			'client',
+			'hidePlayerList',
+			!game.settings.get('stream-view', 'show-player-list'),
+		);
+		game.webrtc.settings.set(
+			'client',
+			'dockSize',
+			game.settings.get('stream-view', 'voice-video-size'),
+		);
 
-		libWrapper.register('stream-view', 'CameraViews.prototype.setUserIsSpeaking', (wrapped, ...args) => {
-			Hooks.call('userIsSpeaking', ...args);
-			wrapped(...args);
-		}, 'WRAPPER');
+		libWrapper.register(
+			'stream-view',
+			'CameraViews.prototype.setUserIsSpeaking',
+			(wrapped, ...args) => {
+				Hooks.call('userIsSpeaking', ...args);
+				wrapped(...args);
+			},
+			'WRAPPER',
+		);
 
-		this.createPopout(StreamView.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
+		if (game.settings.get('stream-view', 'show-chat')) {
+			this.createPopout(StreamView.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
+		}
 		this.focusCombat(game.combat);
 	}
 
 	createPopout(identifier, app) {
 		if (!StreamView.isStreamUser) {
+			return;
+		}
+		if (this._popouts.has(identifier)) {
 			return;
 		}
 
@@ -1063,7 +1126,7 @@ class StreamView {
 		await popout.close();
 	}
 
-	async animateTo({x, y, scale}) {
+	async animateTo({ x, y, scale }) {
 		if (!StreamView.isStreamUser) {
 			return;
 		}
@@ -1072,7 +1135,7 @@ class StreamView {
 			scale = game.settings.get('stream-view');
 		}
 		const duration = game.settings.get('stream-view', 'animation-duration');
-		return canvas.animatePan({x, y, scale, duration});
+		return canvas.animatePan({ x, y, scale, duration });
 	}
 
 	updateScene() {
@@ -1090,7 +1153,11 @@ class StreamView {
 		this._combatActive = !!active;
 
 		if (active && this._isDirectedCamera && !StreamView.isStreamUser) {
-			this._directedPan({x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x});
+			this._directedPan({
+				x: canvas.stage.pivot.x,
+				y: canvas.stage.pivot.y,
+				scale: canvas.stage.scale.x,
+			});
 			return;
 		}
 		if (!StreamView.isStreamUser) {
@@ -1135,7 +1202,7 @@ class StreamView {
 			return;
 		}
 
-		if (!this._popouts.has(StreamView.PopoutIdentifiers.COMBAT)) {
+		if (game.settings.get('stream-view', 'auto-show-combat')) {
 			this.createPopout(StreamView.PopoutIdentifiers.COMBAT, ui.sidebar.tabs.combat);
 		}
 
