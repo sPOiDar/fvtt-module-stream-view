@@ -1,3 +1,13 @@
+## [0.1.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.2...v0.1.3) (2021-06-21)
+
+
+### Bug Fixes
+
+* **core:** Honor settings to hide chat/combat log ([4b159db](https://github.com/sPOiDar/fvtt-module-stream-view/commit/4b159db)), closes [#1](https://github.com/sPOiDar/fvtt-module-stream-view/issues/1)
+
+
+
+
 ## [0.1.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.1...v0.1.2) (2021-06-20)
 
 
