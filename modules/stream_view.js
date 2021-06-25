@@ -1023,7 +1023,13 @@ class StreamView {
 		}
 
 		// Hack around needing to register settings in init, when data is not yet available.
-		game.users.forEach((v) => (StreamView._defaultUserChoices[v.id] = v.name));
+		game.users.forEach((u) => {
+			// Do not offer GM users as Stream View candidates
+			if (u.isGM) {
+				return;
+			}
+			StreamView._defaultUserChoices[u.id] = u.name;
+		});
 		game.settings.settings.get('stream-view.user-id').choices = StreamView._defaultUserChoices;
 		const defaultPadding = this._defaultPadding(false);
 		const defaultCombatPadding = this._defaultPadding(true);
