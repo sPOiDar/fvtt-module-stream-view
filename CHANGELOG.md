@@ -1,3 +1,15 @@
+## [0.1.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.3...v0.1.4) (2021-07-13)
+
+
+### Bug Fixes
+
+* **compatibility:** Bump core compat to v0.8.8 ([1743e09](https://github.com/sPOiDar/fvtt-module-stream-view/commit/1743e09))
+* **core:** Do not attempt updating scene if canvas is not initialized ([4f67634](https://github.com/sPOiDar/fvtt-module-stream-view/commit/4f67634))
+* **core:** Do not offer GMs as candidate users for Stream View ([796e997](https://github.com/sPOiDar/fvtt-module-stream-view/commit/796e997))
+
+
+
+
 ## [0.1.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.2...v0.1.3) (2021-06-21)
 
 
