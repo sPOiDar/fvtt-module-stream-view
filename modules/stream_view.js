@@ -1145,7 +1145,7 @@ class StreamView {
 	}
 
 	updateScene() {
-		if (!StreamView.isStreamUser) {
+		if (!StreamView.isStreamUser || !game.canvas.scene) {
 			return;
 		}
 
