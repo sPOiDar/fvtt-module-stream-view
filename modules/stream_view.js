@@ -1170,6 +1170,10 @@ class StreamView {
 			return;
 		}
 
+		if (game.settings.get('stream-view', 'auto-show-combat')) {
+			this.createPopout(StreamView.PopoutIdentifiers.COMBAT, ui.sidebar.tabs.combat);
+		}
+
 		this.focusCombat(combat);
 	}
 
@@ -1206,10 +1210,6 @@ class StreamView {
 			this.closePopout(StreamView.PopoutIdentifiers.COMBAT);
 			this.focusUpdate();
 			return;
-		}
-
-		if (game.settings.get('stream-view', 'auto-show-combat')) {
-			this.createPopout(StreamView.PopoutIdentifiers.COMBAT, ui.sidebar.tabs.combat);
 		}
 
 		const tokens = this._combatTokens(combat);
