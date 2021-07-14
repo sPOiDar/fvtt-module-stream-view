@@ -1171,6 +1171,11 @@ class StreamView {
 		}
 
 		if (game.settings.get('stream-view', 'auto-show-combat')) {
+			if (!this._combatActive) {
+				this.closePopout(StreamView.PopoutIdentifiers.COMBAT);
+				this.focusUpdate();
+				return;
+			}
 			this.createPopout(StreamView.PopoutIdentifiers.COMBAT, ui.sidebar.tabs.combat);
 		}
 
@@ -1203,12 +1208,6 @@ class StreamView {
 
 	focusCombat(combat) {
 		if (!StreamView.isStreamUser || !this._isAutoCamera) {
-			return;
-		}
-
-		if (!this._combatActive) {
-			this.closePopout(StreamView.PopoutIdentifiers.COMBAT);
-			this.focusUpdate();
 			return;
 		}
 
