@@ -654,7 +654,7 @@ class StreamView {
 		}
 
 		const token = canvas.tokens.get(combatant.token.id);
-		if (!token.isVisible) {
+		if (!token?.isVisible) {
 			return [];
 		}
 		const targets = [token];
