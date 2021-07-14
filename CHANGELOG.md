@@ -1,3 +1,13 @@
+## [0.1.5](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.4...v0.1.5) (2021-07-14)
+
+
+### Bug Fixes
+
+* **combat:** Display combat tracker in Directed camera mode ([d1bbf16](https://github.com/sPOiDar/fvtt-module-stream-view/commit/d1bbf16)), closes [#3](https://github.com/sPOiDar/fvtt-module-stream-view/issues/3)
+
+
+
+
 ## [0.1.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.3...v0.1.4) (2021-07-13)
 
 
