@@ -1,3 +1,14 @@
+## [0.1.6](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.5...v0.1.6) (2021-07-14)
+
+
+### Bug Fixes
+
+* **combat:** Handle missing combatant token ([175d9f4](https://github.com/sPOiDar/fvtt-module-stream-view/commit/175d9f4)), closes [#5](https://github.com/sPOiDar/fvtt-module-stream-view/issues/5)
+* **combat:** Hide combat tracker in Directed camera mode ([3cd0bb9](https://github.com/sPOiDar/fvtt-module-stream-view/commit/3cd0bb9)), closes [#3](https://github.com/sPOiDar/fvtt-module-stream-view/issues/3)
+
+
+
+
 ## [0.1.5](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.4...v0.1.5) (2021-07-14)
 
 
