@@ -30,7 +30,11 @@
       "name": "socketlib"
     }
   ],
+  "license": "LICENSE",
+  "readme": "README.md",
   "url": "https://github.com/sPOiDar/fvtt-module-stream-view",
+  "bugs": "https://github.com/sPOiDar/fvtt-module-stream-view/issues",
+  "changelog": "https://github.com/sPOiDar/fvtt-module-stream-view/blob/master/CHANGELOG.md",
   "manifest": "https://github.com/sPOiDar/fvtt-module-stream-view/raw/master/module.json",
   "download": "https://github.com/sPOiDar/fvtt-module-stream-view/releases/download/v0.1.6/stream-view-v0.1.6.zip"
 }
