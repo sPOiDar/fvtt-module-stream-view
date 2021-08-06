@@ -922,6 +922,8 @@ class StreamView {
 		} else if (app instanceof UserConfig) {
 			setTimeout(() => app.close(), 0);
 			return;
+		} else if (!(app instanceof ImagePopout) && !(app instanceof JournalSheet)) {
+			return;
 		}
 
 		StreamView.hidePopoutHeaders(html);
