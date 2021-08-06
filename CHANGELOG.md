@@ -1,3 +1,13 @@
+## [0.1.7](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.6...v0.1.7) (2021-08-06)
+
+
+### Bug Fixes
+
+* **popouts:** Only track and auto-close ImagePopout and JournalSheet ([490534d](https://github.com/sPOiDar/fvtt-module-stream-view/commit/490534d))
+
+
+
+
 ## [0.1.6](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.5...v0.1.6) (2021-07-14)
 
 
