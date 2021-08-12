@@ -1,3 +1,19 @@
+## [0.1.8](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.7...v0.1.8) (2021-08-12)
+
+
+### Bug Fixes
+
+* **compatibility:** Explicitly exclude popout tracking for SmallTime ([380f244](https://github.com/sPOiDar/fvtt-module-stream-view/commit/380f244))
+* **popouts:** Add support for auto-hiding actors and items/spells/etc ([d9077f0](https://github.com/sPOiDar/fvtt-module-stream-view/commit/d9077f0))
+
+
+### Reverts
+
+* Revert "fix(popouts): Only track and auto-close ImagePopout and JournalSheet" ([c66f832](https://github.com/sPOiDar/fvtt-module-stream-view/commit/c66f832))
+
+
+
+
 ## [0.1.7](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.6...v0.1.7) (2021-08-06)
 
 
