@@ -913,6 +913,7 @@ class StreamView {
 		}
 
 		if (app instanceof ChatLog) {
+			// Extract chat log body.
 			html.find('section.sidebar-tab').replaceWith(html.find('ol#chat-log'));
 			StreamView.hidePopoutHeaders(html);
 			return;
@@ -920,7 +921,11 @@ class StreamView {
 			StreamView.hidePopoutHeaders(html);
 			return;
 		} else if (app instanceof UserConfig) {
+			// Auto-close UserConfig immediately (we don't use it as the stream user).
 			setTimeout(() => app.close(), 0);
+			return;
+		} else if (app instanceof SmallTimeApp) {
+			// Skip tracking of SmallTime.
 			return;
 		}
 
