@@ -1,3 +1,13 @@
+## [0.1.9](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.8...v0.1.9) (2021-08-12)
+
+
+### Bug Fixes
+
+* **compatibility:** Check SmallTimeApp is defined before referencing ([4e861dd](https://github.com/sPOiDar/fvtt-module-stream-view/commit/4e861dd))
+
+
+
+
 ## [0.1.8](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.7...v0.1.8) (2021-08-12)
 
 
