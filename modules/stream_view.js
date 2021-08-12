@@ -924,7 +924,7 @@ class StreamView {
 			// Auto-close UserConfig immediately (we don't use it as the stream user).
 			setTimeout(() => app.close(), 0);
 			return;
-		} else if (app instanceof SmallTimeApp) {
+		} else if (typeof SmallTimeApp !== 'undefined' && app instanceof SmallTimeApp) {
 			// Skip tracking of SmallTime.
 			return;
 		}
