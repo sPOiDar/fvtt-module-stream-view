@@ -1070,6 +1070,8 @@ class StreamView {
 		Hooks.on('chatBubble', (token) => this._isChatting(token));
 		Hooks.on('userIsSpeaking', async (userId, isSpeaking) => this._isSpeaking(userId, isSpeaking));
 		Hooks.on('renderApplication', (app, html) => this._handlePopout(app, html));
+		Hooks.on('renderItemSheet', (app, html) => this._handlePopout(app, html));
+		Hooks.on('renderActorSheet', (app, html) => this._handlePopout(app, html));
 
 		if (game.settings.get('core', 'chatBubblesPan')) {
 			game.settings.set('core', 'chatBubblesPan', false);
