@@ -1058,6 +1058,20 @@ class StreamView {
 		Hooks.on('updateCombat', (app) => this.updateCombat(StreamView.isCombatActive(app), app));
 		Hooks.on('deleteCombat', (app) => this.updateCombat(false, app));
 
+		libWrapper.register(
+			'stream-view',
+			'ChatLog.prototype.scrollBottom',
+			(wrapped, ...args) => {
+				if (args.length === 0) {
+					args.push({ popout: true });
+				} else if (args[0] instanceof Object) {
+					args[0].popout = true;
+				}
+				wrapped(...args);
+			},
+			'WRAPPER',
+		);
+
 		if (!StreamView.isStreamUser) {
 			return;
 		}
