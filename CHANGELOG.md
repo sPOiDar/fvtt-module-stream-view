@@ -1,3 +1,13 @@
+## [0.1.11](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.10...v0.1.11) (2021-08-30)
+
+
+### Bug Fixes
+
+* **chat:** Wrap ChatLog.scrollBottom() to always scroll chat popouts ([f9b79cf](https://github.com/sPOiDar/fvtt-module-stream-view/commit/f9b79cf))
+
+
+
+
 ## [0.1.10](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.9...v0.1.10) (2021-08-22)
 
 
