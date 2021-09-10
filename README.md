@@ -17,7 +17,7 @@ This module provides a minimal UI view with automated camera work, ideal for str
 
 ## Setup
 
-- Create a user that will be used to stream your games, we'll call that user `Stream`.
+- Create a dedicated user that will be used to stream your games, we'll call that user `Stream` (this user should not own any actors/tokens).
 - Assign the Stream user `Observer` permissions for all player actors, this will ensure that the stream view shares vision with your party's tokens.
 - Select the Stream user under Foundry VTT `Settings` -> `Configure Settings` -> `Module Settings` -> `Stream View` -> `Stream User`, and save.
 - Log in with your Stream user in a new browser session, for recording.
