@@ -1,3 +1,19 @@
+# [0.2.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.11...v0.2.0) (2021-09-10)
+
+
+### Bug Fixes
+
+* **docs:** Update README to clarify that stream user must be dedicated ([49aca91](https://github.com/sPOiDar/fvtt-module-stream-view/commit/49aca91))
+* **settings:** Allow camera mode setting to be updated without refresh. ([e775877](https://github.com/sPOiDar/fvtt-module-stream-view/commit/e775877))
+
+
+### Features
+
+* **ui:** Add a setting to enable the full sidebar for settings access ([6ab0f6d](https://github.com/sPOiDar/fvtt-module-stream-view/commit/6ab0f6d))
+
+
+
+
 ## [0.1.11](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.1.10...v0.1.11) (2021-08-30)
 
 
