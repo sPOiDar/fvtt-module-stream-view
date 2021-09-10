@@ -51,7 +51,11 @@ class StreamView {
 		});
 		Hooks.on('renderSceneControls', (_app, html) => this.hideHtml(html));
 		Hooks.on('renderHotbar', (_app, html) => this.hideHtml(html));
-		Hooks.on('renderSidebar', (_app, html) => this.hideHtml(html));
+		Hooks.on('renderSidebar', (_app, html) => {
+			if (!game.settings.get('stream-view', 'show-full-sidebar')) {
+				this.hideHtml(html)
+			}
+		});
 		Hooks.on('renderCameraViews', (_app, html) => this.handleStreamCamera(html));
 		Hooks.on('renderHeadsUpDisplay', (_app, html) => this.appendSpeechBubblesContainer(html));
 		Hooks.on('renderSidebarTab', (app, html) => instance._handlePopout(app, html));
@@ -401,6 +405,16 @@ class StreamView {
 			restricted: true,
 			default: 20,
 			type: Number,
+		});
+
+		game.settings.register('stream-view', 'show-full-sidebar', {
+			name: game.i18n.localize('stream-view.settings.show-full-sidebar.name'),
+			hint: game.i18n.localize('stream-view.settings.show-full-sidebar.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
 		});
 	}
 
@@ -940,6 +954,10 @@ class StreamView {
 			return;
 		}
 
+		if (game.settings.get('stream-view', 'show-full-sidebar')) {
+			return;
+		}
+
 		StreamView.hidePopoutHeaders(html);
 		const autoClose = game.settings.get('stream-view', 'popout-auto-close-duration');
 		this._popouts.set(app.id, app);
@@ -1122,7 +1140,7 @@ class StreamView {
 			'WRAPPER',
 		);
 
-		if (game.settings.get('stream-view', 'show-chat')) {
+		if (game.settings.get('stream-view', 'show-chat') && !game.settings.get('stream-view', 'show-full-sidebar')) {
 			this.createPopout(StreamView.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
 		}
 		this.focusCombat(game.combat);

@@ -21,6 +21,8 @@
 	"stream-view.settings.pan-on-user-speaking.hint": "If using in-game voice chat, focus on the token(s) of recently speaking users (for GMs, the currently selected token will be used, if any).",
 	"stream-view.settings.speaker-decay.name": "Speaker Decay (ms)",
 	"stream-view.settings.speaker-decay.hint": "The time in milliseconds to focus a token after the user stops speaking via in-game voice chat or text.",
+	"stream-view.settings.show-full-sidebar.name": "Show Full Sidebar [WARNING]",
+	"stream-view.settings.show-full-sidebar.hint": "Show full sidebar on Stream View, this will disable all automatic popout handling, and so should only be enabled temporarily, if you need to access e.g. the configuration menu for the stream user. Refresh on the stream client requried.",
 	"stream-view.settings.show-chat.name": "Show Chat",
 	"stream-view.settings.show-chat.hint": "Show chat log on Stream View.",
 	"stream-view.settings.chat-position-x.name": "Chat Position X (pixels)",
