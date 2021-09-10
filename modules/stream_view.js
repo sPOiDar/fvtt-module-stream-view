@@ -59,7 +59,7 @@ class StreamView {
 		Hooks.once('ready', () => instance.ready());
 	}
 
-	static init() {
+	static init(instance) {
 		CONFIG.Canvas.layers.streamView = StreamViewLayer;
 
 		game.settings.register('stream-view', 'user-id', {
@@ -84,6 +84,7 @@ class StreamView {
 				[this.CameraMode.DIRECTED]: this._localizeCameraMode(this.CameraMode.DIRECTED),
 			},
 			default: this.CameraMode.AUTOMATIC,
+			onChange: (mode) => instance._setCameraMode(mode),
 			type: String,
 		});
 
@@ -871,19 +872,38 @@ class StreamView {
 		if (this._cameraMode === StreamView.CameraMode.AUTOMATIC) {
 			targetMode = StreamView.CameraMode.DIRECTED;
 		}
+		this._setCameraMode(targetMode);
+
+	}
+
+	async _setCameraMode(mode) {
+		this._cameraMode = mode;
+
+		if (StreamView.isStreamUser) {
+			this.focusUpdate();
+			return;
+		}
+
+		await this._setGMCameraMode(mode);
+	}
+
+	async _setGMCameraMode(mode) {
+		if (!game.user.isGM || !this._socket) {
+			return;
+		}
+
 		try {
 			await this._socket.executeAsUser(
 				'setCameraMode',
 				game.settings.get('stream-view', 'user-id'),
-				targetMode,
+				mode,
 			);
 		} catch {
-			ui.notifications.warn(`Stream View camera mode could not be updated (user not connected?)`);
+			ui.notifications.warn(`Stream View camera mode not dynamically updated (user not connected?)`);
 			return;
 		}
 
-		this._cameraMode = targetMode;
-		if (targetMode === StreamView.CameraMode.DIRECTED) {
+		if (mode === StreamView.CameraMode.DIRECTED) {
 			this._directedPan({
 				x: canvas.stage.pivot.x,
 				y: canvas.stage.pivot.y,
@@ -893,15 +913,6 @@ class StreamView {
 		ui.notifications.info(
 			`Stream View camera mode is now ${StreamView._localizeCameraMode(this._cameraMode)}`,
 		);
-	}
-
-	_setCameraMode(mode) {
-		if (!StreamView.isStreamUser) {
-			return;
-		}
-
-		this._cameraMode = mode;
-		this.focusUpdate();
 	}
 
 	_handlePopout(app, html) {
