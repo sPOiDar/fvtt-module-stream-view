@@ -1194,7 +1194,7 @@ class StreamView {
 			scale = game.settings.get('stream-view');
 		}
 		const duration = game.settings.get('stream-view', 'animation-duration');
-		return canvas.animatePan({ x, y, scale, duration });
+		return await canvas.animatePan({ x, y, scale, duration });
 	}
 
 	updateScene() {
