@@ -1,3 +1,15 @@
+## [0.2.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.2...v0.2.3) (2021-09-11)
+
+
+### Bug Fixes
+
+* **bubbles:** Honor show-speech-bubbles setting ([1fbd608](https://github.com/sPOiDar/fvtt-module-stream-view/commit/1fbd608))
+* **camera:** Avoid triggering re-focus when pan to speaking disabled ([8fdc20e](https://github.com/sPOiDar/fvtt-module-stream-view/commit/8fdc20e))
+* **camera:** await on canvas.animatePan in prep for animation chaining ([8efcfc9](https://github.com/sPOiDar/fvtt-module-stream-view/commit/8efcfc9))
+
+
+
+
 ## [0.2.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.1...v0.2.2) (2021-09-11)
 
 
