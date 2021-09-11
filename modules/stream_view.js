@@ -622,6 +622,9 @@ class StreamView {
 
 	_speakingTokens() {
 		const tokens = [];
+		if (!game.settings.get('stream-view', 'pan-on-user-speaking')) {
+			return tokens;
+		}
 		const decay = game.settings.get('stream-view', 'speaker-decay');
 		this._speakerHistory.forEach((hist) => {
 			if (
