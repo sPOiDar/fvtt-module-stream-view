@@ -797,7 +797,7 @@ class StreamView {
 	}
 
 	async _isSpeaking(userId, isSpeaking, token) {
-		if (!StreamView.isStreamUser) {
+		if (!StreamView.isStreamUser || !game.settings.get('stream-view', 'pan-on-user-speaking')) {
 			return;
 		}
 
