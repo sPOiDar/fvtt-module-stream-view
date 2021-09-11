@@ -1,3 +1,13 @@
+## [0.2.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.3...v0.2.4) (2021-09-11)
+
+
+### Bug Fixes
+
+* **bubbles:** Allow bubbles to function even if speech focus is disabled ([6a0603a](https://github.com/sPOiDar/fvtt-module-stream-view/commit/6a0603a))
+
+
+
+
 ## [0.2.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.2...v0.2.3) (2021-09-11)
 
 
