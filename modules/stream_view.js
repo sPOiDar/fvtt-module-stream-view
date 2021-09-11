@@ -749,8 +749,8 @@ class StreamView {
 			return;
 		}
 		const wasSpeaking = !!this._speakerHistory.get(user.id)?.current?.isSpeaking;
-		this._isSpeaking(user.id, true, token);
-		setTimeout(() => this._isSpeaking(user.id, wasSpeaking, token), 1);
+		this._speakingUpdate(user.id, true, token);
+		setTimeout(() => this._speakingUpdate(user.id, wasSpeaking, token), 1);
 	}
 
 	async _tokenForGM(userId) {
@@ -778,11 +778,10 @@ class StreamView {
 		const hist = this._speakerHistory.get(userId);
 		if (hist && !isSpeaking) {
 			token = this._speakerHistory.get(userId).current.token;
-			if (hist.current.isSpeaking && game.settings.get('stream-view', 'show-speech-bubbles')) {
-				this._speechBubbles.hide(token);
-			}
+			this._bubblesUpdate(token, isSpeaking);
 			return token;
 		}
+
 		if (user.isGM) {
 			token = await this._tokenForGM(userId);
 		} else {
@@ -790,14 +789,24 @@ class StreamView {
 				(t) => t.actor?.hasPlayerOwner && user.character && t.actor.id == user.character.id,
 			);
 		}
-		if (token && isSpeaking && game.settings.get('stream-view', 'show-speech-bubbles')) {
-			this._speechBubbles.show(token);
-		}
+		this._bubblesUpdate(token, isSpeaking);
 		return token;
 	}
 
-	async _isSpeaking(userId, isSpeaking, token) {
-		if (!StreamView.isStreamUser || !game.settings.get('stream-view', 'pan-on-user-speaking')) {
+	async _bubblesUpdate(token, isSpeaking) {
+		if (!game.settings.get('stream-view', 'show-speech-bubbles')) {
+			return;
+		}
+
+		if (!isSpeaking) {
+			return this._speechBubbles.hide(token);
+		}
+
+		return this._speechBubbles.show(token);
+	}
+
+	async _speakingUpdate(userId, isSpeaking, token) {
+		if (!StreamView.isStreamUser) {
 			return;
 		}
 
@@ -813,6 +822,11 @@ class StreamView {
 			current: { isSpeaking: isSpeaking, token: token, last: performance.now() },
 		};
 		this._speakerHistory.set(userId, result);
+
+		if (!game.settings.get('stream-view', 'pan-on-user-speaking')) {
+			return;
+		}
+
 		if (!isSpeaking) {
 			if (!result.previous?.isSpeaking) {
 				return;
@@ -1114,7 +1128,7 @@ class StreamView {
 		Hooks.on('updateMeasuredTemplate', () => this.focusUpdate());
 		Hooks.on('deleteMeasuredTemplate', () => this.focusUpdate());
 		Hooks.on('chatBubble', (token) => this._isChatting(token));
-		Hooks.on('userIsSpeaking', async (userId, isSpeaking) => this._isSpeaking(userId, isSpeaking));
+		Hooks.on('userIsSpeaking', async (userId, isSpeaking) => this._speakingUpdate(userId, isSpeaking));
 		Hooks.on('renderApplication', (app, html) => this._handlePopout(app, html));
 		Hooks.on('renderItemSheet', (app, html) => this._handlePopout(app, html));
 		Hooks.on('renderActorSheet', (app, html) => this._handlePopout(app, html));
