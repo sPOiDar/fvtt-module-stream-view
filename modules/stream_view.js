@@ -778,7 +778,7 @@ class StreamView {
 		const hist = this._speakerHistory.get(userId);
 		if (hist && !isSpeaking) {
 			token = this._speakerHistory.get(userId).current.token;
-			if (hist.current.isSpeaking) {
+			if (hist.current.isSpeaking && game.settings.get('stream-view', 'show-speech-bubbles')) {
 				this._speechBubbles.hide(token);
 			}
 			return token;
@@ -790,7 +790,7 @@ class StreamView {
 				(t) => t.actor?.hasPlayerOwner && user.character && t.actor.id == user.character.id,
 			);
 		}
-		if (token && isSpeaking) {
+		if (token && isSpeaking && game.settings.get('stream-view', 'show-speech-bubbles')) {
 			this._speechBubbles.show(token);
 		}
 		return token;
