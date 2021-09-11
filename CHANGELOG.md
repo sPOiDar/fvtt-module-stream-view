@@ -1,3 +1,18 @@
+## [0.2.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.1...v0.2.2) (2021-09-11)
+
+
+### Bug Fixes
+
+* **camera:** Honor pan on user speaking setting ([14db2ce](https://github.com/sPOiDar/fvtt-module-stream-view/commit/14db2ce))
+
+
+### Reverts
+
+* Revert "fix(camera): Honor pan on user speaking setting" ([f35ef0d](https://github.com/sPOiDar/fvtt-module-stream-view/commit/f35ef0d))
+
+
+
+
 ## [0.2.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.0...v0.2.1) (2021-09-10)
 
 
