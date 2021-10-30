@@ -578,7 +578,7 @@ class StreamView {
 		if (StreamView.isStreamUser) {
 			return;
 		}
-		if (!this._isDirectedCamera) {
+		if (!this._isDirectedCamera || !game.canvas.scene?.active) {
 			return;
 		}
 		if (this._combatActive && game.settings.get('stream-view', 'directed-combat')) {
