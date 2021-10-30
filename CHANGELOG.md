@@ -1,3 +1,13 @@
+# [0.3.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.4...v0.3.0) (2021-10-30)
+
+
+### Features
+
+* **camera:** Do not track directed camera on inactive scenes ([1fcc505](https://github.com/sPOiDar/fvtt-module-stream-view/commit/1fcc505)), closes [#9](https://github.com/sPOiDar/fvtt-module-stream-view/issues/9)
+
+
+
+
 ## [0.2.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.3...v0.2.4) (2021-09-11)
 
 
