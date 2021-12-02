@@ -64,7 +64,14 @@ class StreamView {
 	}
 
 	static init(instance) {
-		CONFIG.Canvas.layers.streamView = StreamViewLayer;
+		if (isNewerVersion(game.version, '9.0')) {
+			CONFIG.Canvas.layers.streamView = {
+				layerClass: StreamViewLayer,
+				group: "interface",
+			};
+		} else {
+			CONFIG.Canvas.layers.streamView = StreamViewLayer;
+		}
 
 		game.settings.register('stream-view', 'user-id', {
 			name: game.i18n.localize('stream-view.settings.user-id.name'),
