@@ -13,6 +13,8 @@
 	"stream-view.settings.minimum-scale.hint": "Minimum scale when zooming in Automatic camera mode.",
 	"stream-view.settings.animation-duration.name": "Camera Animation Duration (ms)",
 	"stream-view.settings.animation-duration.hint": "Duration in milliseconds for animation of camera movement in Automatic camera mode.",
+	"stream-view.settings.show-gm-camera-preview.name": "Show GM camera preview",
+	"stream-view.settings.show-gm-camera-preview.hint": "Displays an overlay of the stream view camera bounds on the GM view.",
 	"stream-view.settings.directed-combat.name": "Directed Combat",
 	"stream-view.settings.directed-combat.hint": "If enabled, during combat the Stream View camera will follow the view of the current combatant.",
 	"stream-view.settings.show-speech-bubbles.name": "Show Speech Bubbles",

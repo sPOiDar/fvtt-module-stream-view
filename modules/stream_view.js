@@ -149,6 +149,16 @@ class StreamView {
 			type: Number,
 		});
 
+		game.settings.register('stream-view', 'show-gm-camera-preview', {
+			name: game.i18n.localize('stream-view.settings.show-gm-camera-preview.name'),
+			hint: game.i18n.localize('stream-view.settings.show-gm-camera-preview.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'show-speech-bubbles', {
 			name: game.i18n.localize('stream-view.settings.show-speech-bubbles.name'),
 			hint: game.i18n.localize('stream-view.settings.show-speech-bubbles.hint'),
@@ -1212,7 +1222,7 @@ class StreamView {
 		}
 
 		if (scale === undefined) {
-			scale = game.settings.get('stream-view');
+			scale = game.settings.get('stream-view', 'minimum-scale');
 		}
 		const duration = game.settings.get('stream-view', 'animation-duration');
 		return await canvas.animatePan({ x, y, scale, duration });
