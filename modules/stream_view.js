@@ -1,35 +1,15 @@
 import { SpeechBubbles } from './speech_bubbles.js';
 import { StreamViewLayer } from './layer.js';
+import { StreamViewOptions } from './options.js';
 
 class StreamView {
-	static CameraMode = {
-		AUTOMATIC: 'automatic',
-		DIRECTED: 'directed',
-	};
-	static PopoutIdentifiers = {
-		COMBAT: 'combat',
-		CHAT: 'chat',
-	};
-	static VoiceVideoSize = {
-		SMALL: 'small',
-		MEDIUM: 'medium',
-		LARGE: 'large',
-	};
 	static _voiceVideoSizePixels = {
-		[this.VoiceVideoSize.SMALL]: 157,
-		[this.VoiceVideoSize.MEDIUM]: 217,
-		[this.VoiceVideoSize.LARGE]: 277,
+		[StreamViewOptions.VoiceVideoSize.SMALL]: 157,
+		[StreamViewOptions.VoiceVideoSize.MEDIUM]: 217,
+		[StreamViewOptions.VoiceVideoSize.LARGE]: 277,
 	};
 	static _unknownUserId = 'unknownUser';
 	static _defaultUserChoices = { [this._unknownUserId]: '' };
-
-	static _localizeCameraMode(mode) {
-		return game.i18n.localize(`stream-view.settings.camera-mode.option.${mode}`);
-	}
-
-	static _localizeVoiceVideoSize(size) {
-		return game.i18n.localize(`stream-view.settings.voice-video-size.option.${size}`);
-	}
 
 	static start() {
 		const instance = new StreamView();
@@ -91,10 +71,10 @@ class StreamView {
 			config: true,
 			restricted: true,
 			choices: {
-				[this.CameraMode.AUTOMATIC]: this._localizeCameraMode(this.CameraMode.AUTOMATIC),
-				[this.CameraMode.DIRECTED]: this._localizeCameraMode(this.CameraMode.DIRECTED),
+				[StreamViewOptions.CameraMode.AUTOMATIC]: StreamViewOptions.localizeCameraMode(StreamViewOptions.CameraMode.AUTOMATIC),
+				[StreamViewOptions.CameraMode.DIRECTED]: StreamViewOptions.localizeCameraMode(StreamViewOptions.CameraMode.DIRECTED),
 			},
-			default: this.CameraMode.AUTOMATIC,
+			default: StreamViewOptions.CameraMode.AUTOMATIC,
 			onChange: (mode) => instance._setCameraMode(mode),
 			type: String,
 		});
@@ -149,14 +129,20 @@ class StreamView {
 			type: Number,
 		});
 
-		game.settings.register('stream-view', 'show-gm-camera-preview', {
-			name: game.i18n.localize('stream-view.settings.show-gm-camera-preview.name'),
-			hint: game.i18n.localize('stream-view.settings.show-gm-camera-preview.hint'),
+		game.settings.register('stream-view', 'preview-display', {
+			name: game.i18n.localize('stream-view.settings.preview-display.name'),
+			hint: game.i18n.localize('stream-view.settings.preview-display.hint'),
 			scope: 'world',
 			config: true,
 			restricted: true,
-			default: false,
-			type: Boolean,
+			choices: {
+				[StreamViewOptions.PreviewDisplay.NEVER]: StreamViewOptions.localizePreviewDisplay(StreamViewOptions.PreviewDisplay.NEVER),
+				[StreamViewOptions.PreviewDisplay.ALWAYS]: StreamViewOptions.localizePreviewDisplay(StreamViewOptions.PreviewDisplay.ALWAYS),
+				[StreamViewOptions.PreviewDisplay.LAYER]: StreamViewOptions.localizePreviewDisplay(StreamViewOptions.PreviewDisplay.LAYER),
+			},
+			default: StreamViewOptions.PreviewDisplay.LAYER,
+			onChange: () => this._previewRefresh(),
+			type: String,
 		});
 
 		game.settings.register('stream-view', 'show-speech-bubbles', {
@@ -266,11 +252,11 @@ class StreamView {
 			config: true,
 			restricted: true,
 			choices: {
-				[this.VoiceVideoSize.SMALL]: this._localizeVoiceVideoSize(this.VoiceVideoSize.SMALL),
-				[this.VoiceVideoSize.MEDIUM]: this._localizeVoiceVideoSize(this.VoiceVideoSize.MEDIUM),
-				[this.VoiceVideoSize.LARGE]: this._localizeVoiceVideoSize(this.VoiceVideoSize.LARGE),
+				[StreamViewOptions.VoiceVideoSize.SMALL]: StreamViewOptions.localizeVoiceVideoSize(StreamViewOptions.VoiceVideoSize.SMALL),
+				[StreamViewOptions.VoiceVideoSize.MEDIUM]: StreamViewOptions.localizeVoiceVideoSize(StreamViewOptions.VoiceVideoSize.MEDIUM),
+				[StreamViewOptions.VoiceVideoSize.LARGE]: StreamViewOptions.localizeVoiceVideoSize(StreamViewOptions.VoiceVideoSize.LARGE),
 			},
-			default: this.VoiceVideoSize.SMALL,
+			default: StreamViewOptions.VoiceVideoSize.SMALL,
 			type: String,
 		});
 
@@ -487,10 +473,17 @@ class StreamView {
 		return combat?.current?.round > 0;
 	}
 
+	static _previewRefresh() {
+		const layer = canvas.layers.find((l) => l instanceof StreamViewLayer);
+		if (layer) {
+			layer.refresh();
+		}
+	}
+
 	constructor() {
 		this._speechBubbles = new SpeechBubbles();
 		this._socket = undefined;
-		this._cameraMode = StreamView.CameraMode.AUTOMATIC;
+		this._cameraMode = StreamViewOptions.CameraMode.AUTOMATIC;
 		this._speakerHistory = new Map();
 		this._popouts = new Map();
 		this._controlledTokenId = null;
@@ -579,14 +572,14 @@ class StreamView {
 
 	get _isAutoCamera() {
 		return (
-			this._cameraMode === StreamView.CameraMode.AUTOMATIC &&
+			this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC &&
 			!(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
 
 	get _isDirectedCamera() {
 		return (
-			this._cameraMode === StreamView.CameraMode.DIRECTED ||
+			this._cameraMode === StreamViewOptions.CameraMode.DIRECTED ||
 			(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
@@ -878,7 +871,7 @@ class StreamView {
 					title: 'stream-view.controls.toggle-camera-mode',
 					icon: 'fas fa-video',
 					toggle: true,
-					active: this._cameraMode === StreamView.CameraMode.DIRECTED,
+					active: this._cameraMode === StreamViewOptions.CameraMode.DIRECTED,
 					onClick: () => this._toggleCameraMode(),
 				},
 				{
@@ -916,9 +909,9 @@ class StreamView {
 			return;
 		}
 
-		let targetMode = StreamView.CameraMode.AUTOMATIC;
-		if (this._cameraMode === StreamView.CameraMode.AUTOMATIC) {
-			targetMode = StreamView.CameraMode.DIRECTED;
+		let targetMode = StreamViewOptions.CameraMode.AUTOMATIC;
+		if (this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC) {
+			targetMode = StreamViewOptions.CameraMode.DIRECTED;
 		}
 		this._setCameraMode(targetMode);
 
@@ -951,7 +944,7 @@ class StreamView {
 			return;
 		}
 
-		if (mode === StreamView.CameraMode.DIRECTED) {
+		if (mode === StreamViewOptions.CameraMode.DIRECTED) {
 			this._directedPan({
 				x: canvas.stage.pivot.x,
 				y: canvas.stage.pivot.y,
@@ -959,8 +952,16 @@ class StreamView {
 			});
 		}
 		ui.notifications.info(
-			`Stream View camera mode is now ${StreamView._localizeCameraMode(this._cameraMode)}`,
+			`Stream View camera mode is now ${StreamViewOptions.localizeCameraMode(this._cameraMode)}`,
 		);
+	}
+
+	_previewCamera({ x, y, width, height }) {
+		if (!game.user.isGM) {
+			return;
+		}
+
+		canvas.streamView.drawPreview({ x, y, width, height });
 	}
 
 	_handlePopout(app, html) {
@@ -1008,7 +1009,7 @@ class StreamView {
 
 		const ids = [...this._popouts.keys()];
 		for (let id of ids) {
-			if (id === StreamView.PopoutIdentifiers.CHAT || id === StreamView.PopoutIdentifiers.COMBAT) {
+			if (id === StreamViewOptions.PopoutIdentifiers.CHAT || id === StreamViewOptions.PopoutIdentifiers.COMBAT) {
 				continue;
 			}
 			await this.closePopout(id);
@@ -1060,11 +1061,20 @@ class StreamView {
 		return padding;
 	}
 
+	async _sendCameraPreview({ x, y, scale }) {
+		const width = window.innerWidth / scale;
+		const height = window.innerHeight / scale;
+		const px = x - (width / 2);
+		const py = y - (height / 2);
+		this._socket.executeForAllGMs('previewCamera', { x: px, y: py, width, height });
+	}
+
 	socketReady(socket) {
 		socket.register('controlledToken', this._controlledToken.bind(this));
 		socket.register('animateTo', this._debounceAnimateTo.bind(this));
 		socket.register('setCameraMode', this._setCameraMode.bind(this));
 		socket.register('closePopouts', this._closePopouts.bind(this));
+		socket.register('previewCamera', this._previewCamera.bind(this));
 		this._socket = socket;
 	}
 
@@ -1175,7 +1185,7 @@ class StreamView {
 		);
 
 		if (game.settings.get('stream-view', 'show-chat') && !game.settings.get('stream-view', 'show-full-sidebar')) {
-			this.createPopout(StreamView.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
+			this.createPopout(StreamViewOptions.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
 		}
 		this.focusCombat(game.combat);
 	}
@@ -1225,11 +1235,17 @@ class StreamView {
 			scale = game.settings.get('stream-view', 'minimum-scale');
 		}
 		const duration = game.settings.get('stream-view', 'animation-duration');
-		return await canvas.animatePan({ x, y, scale, duration });
+		if (game.settings.get('stream-view', 'preview-display') !== StreamViewOptions.PreviewDisplay.NEVER) {
+			this._sendCameraPreview({ x, y, scale });
+		}
+		return canvas.animatePan({ x, y, scale, duration });
 	}
 
 	updateScene() {
 		if (!StreamView.isStreamUser || !game.canvas.scene) {
+			if (game.user.isGM) {
+				StreamView._previewRefresh();
+			}
 			return;
 		}
 
@@ -1256,11 +1272,11 @@ class StreamView {
 
 		if (game.settings.get('stream-view', 'auto-show-combat')) {
 			if (!this._combatActive) {
-				this.closePopout(StreamView.PopoutIdentifiers.COMBAT);
+				this.closePopout(StreamViewOptions.PopoutIdentifiers.COMBAT);
 				this.focusUpdate();
 				return;
 			}
-			this.createPopout(StreamView.PopoutIdentifiers.COMBAT, ui.sidebar.tabs.combat);
+			this.createPopout(StreamViewOptions.PopoutIdentifiers.COMBAT, ui.sidebar.tabs.combat);
 		}
 
 		this.focusCombat(combat);
