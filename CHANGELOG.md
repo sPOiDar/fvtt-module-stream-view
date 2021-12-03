@@ -1,3 +1,19 @@
+# [0.4.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.3.0...v0.4.0) (2021-12-03)
+
+
+### Bug Fixes
+
+* **camera:** Fix undefined scale in `animateTo` ([4bcd497](https://github.com/sPOiDar/fvtt-module-stream-view/commit/4bcd497))
+* **compatibility:** Update layer instantiation for core v9 compat ([5d4e4c7](https://github.com/sPOiDar/fvtt-module-stream-view/commit/5d4e4c7))
+
+
+### Features
+
+* **UI:** Add option to display preview of camera bounds on GM display ([84623b6](https://github.com/sPOiDar/fvtt-module-stream-view/commit/84623b6))
+
+
+
+
 # [0.3.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.2.4...v0.3.0) (2021-10-30)
 
 
