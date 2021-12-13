@@ -1,3 +1,13 @@
+## [0.4.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.0...v0.4.1) (2021-12-13)
+
+
+### Bug Fixes
+
+* **compatibility:** Correctly query game version for both v0.8/v9 ([2287c93](https://github.com/sPOiDar/fvtt-module-stream-view/commit/2287c93))
+
+
+
+
 # [0.4.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.3.0...v0.4.0) (2021-12-03)
 
 
