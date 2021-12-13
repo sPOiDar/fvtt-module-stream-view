@@ -44,7 +44,8 @@ class StreamView {
 	}
 
 	static init(instance) {
-		if (isNewerVersion(game.version, '9.0')) {
+		const gameVersion = game.version ?? game.data?.version;
+		if (isNewerVersion(gameVersion, '9.0')) {
 			CONFIG.Canvas.layers.streamView = {
 				layerClass: StreamViewLayer,
 				group: "interface",
