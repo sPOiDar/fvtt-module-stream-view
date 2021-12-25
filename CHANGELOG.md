@@ -1,3 +1,13 @@
+## [0.4.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.1...v0.4.2) (2021-12-25)
+
+
+### Bug Fixes
+
+* **compatibility:** Bump core compat to v9 ([85e0fac](https://github.com/sPOiDar/fvtt-module-stream-view/commit/85e0fac))
+
+
+
+
 ## [0.4.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.0...v0.4.1) (2021-12-13)
 
 
