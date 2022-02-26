@@ -29,8 +29,9 @@ This module provides a minimal UI view with automated camera work, ideal for str
 - ???
 - Profit
 
+__Note__: Windows users, please ensure that you're using OBS Studio >= v27.2 if you want to capture Foundry using the Browser Source.
+
 ## TODO
 
 - Record some demonstration videos to show off the features.
-- Add auto-camera viewport preview to the Stream View toolbar for GMs, requires implementing a fully functional layer and Document/DocumentConfig/etc based on Drawing.
 - See if there's any sane way to do Discord voice activity detection, unfortunately there's no tidy solution for this, particularly for hosted Foundry.
