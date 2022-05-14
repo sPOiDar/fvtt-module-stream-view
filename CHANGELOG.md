@@ -1,3 +1,13 @@
+## [0.4.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.2...v0.4.3) (2022-05-14)
+
+
+### Bug Fixes
+
+* **docs:** Remote TODO for camera preview, has been implemented. ([9499b52](https://github.com/sPOiDar/fvtt-module-stream-view/commit/9499b52))
+
+
+
+
 ## [0.4.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.1...v0.4.2) (2021-12-25)
 
 
