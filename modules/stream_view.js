@@ -985,8 +985,14 @@ class StreamView {
 			// Auto-close UserConfig immediately (we don't use it as the stream user).
 			setTimeout(() => app.close(), 0);
 			return;
-		} else if (typeof SmallTimeApp !== 'undefined' && app instanceof SmallTimeApp) {
+		} else if (app.constructor?.name === 'SmallTimeApp') {
 			// Skip tracking of SmallTime.
+			return;
+		} else if (app.constructor?.name === 'PartyOverviewApp') {
+			// Skip tracking of PartyOverviewApp.
+			return;
+		} else if (html.hasClass('simple-calendar')) {
+			// Skip tracking of Simple Calendar.
 			return;
 		}
 
