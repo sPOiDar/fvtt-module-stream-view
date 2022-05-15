@@ -490,6 +490,8 @@ class StreamView {
 		this._controlledTokenId = null;
 		this._sceneId = null;
 		this._debounceAnimateTo = foundry.utils.debounce(this.animateTo.bind(this), 100);
+		this._notesStatus = false;
+		this._foregroundStatus = false;
 	}
 
 	_coordBounds(coords = []) {
@@ -876,6 +878,22 @@ class StreamView {
 					onClick: () => this._toggleCameraMode(),
 				},
 				{
+					name: "foreground",
+					title: "CONTROLS.TileForeground",
+					icon: "fas fa-home",
+					toggle: true,
+					active: this._foregroundStatus,
+					onClick: (toggled) => this._sendToggleForeground(toggled),
+				},
+				{
+					name: "toggle",
+					title: "CONTROLS.NoteToggle",
+					icon: "fas fa-map-pin",
+					toggle: true,
+					active: this._notesStatus,
+					onClick: (toggled) => this._sendToggleNotes(toggled),
+				},
+				{
 					name: 'close-popouts',
 					title: 'stream-view.controls.close-popouts',
 					icon: 'far fa-window-restore',
@@ -900,6 +918,77 @@ class StreamView {
 			return;
 		}
 		ui.notifications.info('Stream View popouts closed');
+	}
+
+	async _sendGetForegroundStatus() {
+		try {
+			const fgStatus = await this._socket.executeAsUser(
+				'getForegroundStatus',
+				game.settings.get('stream-view', 'user-id')
+			);
+			this._foregroundStatus = fgStatus;
+		} catch {
+			return;
+		}
+	}
+
+	async _sendGetNotesStatus() {
+		try {
+			this._notesStatus = await this._socket.executeAsUser(
+				'getNotesStatus',
+				game.settings.get('stream-view', 'user-id')
+			);
+		} catch {
+			return;
+		}
+	}
+
+	_getForegroundStatus() {
+		// TODO: Remove alpha check if foundry is updated to correctly reflect the layer status for non-GM users.
+		return (canvas.foreground?._active ?? false) || canvas.foreground?.alpha == 1
+	}
+
+	_getNotesStatus() {
+		return game.settings.get("core", NotesLayer.TOGGLE_SETTING)
+	}
+
+	async _sendToggleForeground(toggled) {
+		try {
+			this._foregroundStatus = await this._socket.executeAsUser(
+				'toggleForeground',
+				game.settings.get('stream-view', 'user-id'),
+				toggled
+			);
+		} catch(e) {
+			ui.notifications.warn(`Could not toggle Stream View foreground status (user not connected?)`);
+			return;
+		}
+	}
+
+	async _sendToggleNotes(toggled) {
+		try {
+			this._notesStatus = await this._socket.executeAsUser(
+				'toggleNotes',
+				game.settings.get('stream-view', 'user-id'),
+				toggled
+			);
+		} catch(e) {
+			ui.notifications.warn(`Could not toggle Stream View notes status (user not connected?)`);
+			return;
+		}
+	}
+
+	_toggleForeground(toggled) {
+		canvas[toggled ? "foreground" : "background"].activate()
+		return this._getForegroundStatus()
+	}
+
+	_toggleNotes(toggled) {
+		const currentLayer = canvas.activeLayer.options.name;
+		canvas.activateLayer(NotesLayer.layerOptions.name);
+		game.settings.set("core", NotesLayer.TOGGLE_SETTING, toggled)
+		canvas.activateLayer(currentLayer);
+		return this._getNotesStatus()
 	}
 
 	async _toggleCameraMode() {
@@ -1076,12 +1165,24 @@ class StreamView {
 		this._socket.executeForAllGMs('previewCamera', { x: px, y: py, width, height });
 	}
 
+	_socketConnected(userId) {
+		if (userId == game.settings.get('stream-view', 'user-id')) {
+			this._sendGetNotesStatus();
+			this._sendGetForegroundStatus();
+		}
+	}
+
 	socketReady(socket) {
+		socket.register('connected', this._socketConnected.bind(this));
 		socket.register('controlledToken', this._controlledToken.bind(this));
 		socket.register('animateTo', this._debounceAnimateTo.bind(this));
 		socket.register('setCameraMode', this._setCameraMode.bind(this));
 		socket.register('closePopouts', this._closePopouts.bind(this));
 		socket.register('previewCamera', this._previewCamera.bind(this));
+		socket.register('toggleForeground', this._toggleForeground.bind(this));
+		socket.register('toggleNotes', this._toggleNotes.bind(this));
+		socket.register('getForegroundStatus', this._getForegroundStatus.bind(this));
+		socket.register('getNotesStatus', this._getNotesStatus.bind(this));
 		this._socket = socket;
 	}
 
@@ -1151,6 +1252,15 @@ class StreamView {
 			},
 			'WRAPPER',
 		);
+
+		try {
+			if (game?.user?.isGM) {
+				this._sendGetNotesStatus();
+				this._sendGetForegroundStatus();
+			}
+
+			this._socket.executeForAllGMs('connected', game?.user?.id);
+		} catch {}
 
 		if (!StreamView.isStreamUser) {
 			return;
