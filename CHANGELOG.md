@@ -1,3 +1,8 @@
+## [0.4.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.3...v0.4.4) (2022-05-15)
+
+
+
+
 ## [0.4.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.2...v0.4.3) (2022-05-14)
 
 
