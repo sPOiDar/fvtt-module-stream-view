@@ -1,3 +1,20 @@
+# [1.0.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.4...v1.0.0) (2022-09-10)
+
+
+### Bug Fixes
+
+* **compatibility:** Update for compatibility with core v10 ([45c9bc6](https://github.com/sPOiDar/fvtt-module-stream-view/commit/45c9bc6)), closes [#27](https://github.com/sPOiDar/fvtt-module-stream-view/issues/27)
+
+
+### BREAKING CHANGES
+
+* **compatibility:** Due to some fundamental changes in v10, this and future
+versions will not maintain backwards compatibility for Foundry versions
+prior to v10.
+
+
+
+
 ## [0.4.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.3...v0.4.4) (2022-05-15)
 
 
