@@ -3,11 +3,6 @@ import { StreamViewLayer } from './layer.js';
 import { StreamViewOptions } from './options.js';
 
 class StreamView {
-	static _voiceVideoSizePixels = {
-		[StreamViewOptions.VoiceVideoSize.SMALL]: 157,
-		[StreamViewOptions.VoiceVideoSize.MEDIUM]: 217,
-		[StreamViewOptions.VoiceVideoSize.LARGE]: 277,
-	};
 	static _unknownUserId = 'unknownUser';
 	static _defaultUserChoices = { [this._unknownUserId]: '' };
 
@@ -36,7 +31,7 @@ class StreamView {
 				this.hideHtml(html)
 			}
 		});
-		Hooks.on('renderCameraViews', (_app, html) => this.handleStreamCamera(html));
+		Hooks.on('renderCameraViews', (_app, html) => this.handleStreamAV(html));
 		Hooks.on('renderHeadsUpDisplay', (_app, html) => this.appendSpeechBubblesContainer(html));
 		Hooks.on('renderSidebarTab', (app, html) => instance._handlePopout(app, html));
 		Hooks.on('renderUserConfig', (app, html) => instance._handlePopout(app, html));
@@ -44,15 +39,10 @@ class StreamView {
 	}
 
 	static init(instance) {
-		const gameVersion = game.version ?? game.data?.version;
-		if (isNewerVersion(gameVersion, '9.0')) {
-			CONFIG.Canvas.layers.streamView = {
-				layerClass: StreamViewLayer,
-				group: "interface",
-			};
-		} else {
-			CONFIG.Canvas.layers.streamView = StreamViewLayer;
-		}
+		CONFIG.Canvas.layers.streamView = {
+			layerClass: StreamViewLayer,
+			group: "interface",
+		};
 
 		game.settings.register('stream-view', 'user-id', {
 			name: game.i18n.localize('stream-view.settings.user-id.name'),
@@ -246,40 +236,55 @@ class StreamView {
 			type: Boolean,
 		});
 
-		game.settings.register('stream-view', 'voice-video-size', {
-			name: game.i18n.localize('stream-view.settings.voice-video-size.name'),
-			hint: game.i18n.localize('stream-view.settings.voice-video-size.hint'),
+		game.settings.register('stream-view', 'voice-video-position', {
+			name: game.i18n.localize('stream-view.settings.voice-video-position.name'),
+			hint: game.i18n.localize('stream-view.settings.voice-video-position.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			choices: Object.fromEntries(Object.values(AVSettings.DOCK_POSITIONS).map(p => {
+				return [p, game.i18n.localize(`WEBRTC.DockPosition${p.titleCase()}`)];
+			})),
+			default: AVSettings.DOCK_POSITIONS.LEFT,
+			type: String,
+		});
+
+		game.settings.register('stream-view', 'voice-video-width', {
+			name: game.i18n.localize('stream-view.settings.voice-video-width.name'),
+			hint: game.i18n.localize('stream-view.settings.voice-video-width.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 240,
+			type: Number,
+		});
+
+		game.settings.register('stream-view', 'voice-video-nameplate-mode', {
+			name: game.i18n.localize('stream-view.settings.voice-video-nameplate-mode.name'),
+			hint: game.i18n.localize('stream-view.settings.voice-video-nameplate-mode.hint'),
 			scope: 'world',
 			config: true,
 			restricted: true,
 			choices: {
-				[StreamViewOptions.VoiceVideoSize.SMALL]: StreamViewOptions.localizeVoiceVideoSize(StreamViewOptions.VoiceVideoSize.SMALL),
-				[StreamViewOptions.VoiceVideoSize.MEDIUM]: StreamViewOptions.localizeVoiceVideoSize(StreamViewOptions.VoiceVideoSize.MEDIUM),
-				[StreamViewOptions.VoiceVideoSize.LARGE]: StreamViewOptions.localizeVoiceVideoSize(StreamViewOptions.VoiceVideoSize.LARGE),
+				[AVSettings.NAMEPLATE_MODES.OFF]: game.i18n.localize('WEBRTC.NameplatesOff'),
+				[AVSettings.NAMEPLATE_MODES.PLAYER_ONLY]: game.i18n.localize('WEBRTC.NameplatesPlayer'),
+				[AVSettings.NAMEPLATE_MODES.CHAR_ONLY]: game.i18n.localize('WEBRTC.NameplatesCharacter'),
+				[AVSettings.NAMEPLATE_MODES.BOTH]: game.i18n.localize('WEBRTC.NameplatesBoth'),
 			},
-			default: StreamViewOptions.VoiceVideoSize.SMALL,
-			type: String,
-		});
-
-		game.settings.register('stream-view', 'voice-video-position-x', {
-			name: game.i18n.localize('stream-view.settings.voice-video-position-x.name'),
-			hint: game.i18n.localize('stream-view.settings.voice-video-position-x.hint'),
-			scope: 'world',
-			config: true,
-			restricted: true,
-			default: 20,
+			default: AVSettings.NAMEPLATE_MODES.BOTH,
 			type: Number,
 		});
 
-		game.settings.register('stream-view', 'voice-video-position-y', {
-			name: game.i18n.localize('stream-view.settings.voice-video-position-y.name'),
-			hint: game.i18n.localize('stream-view.settings.voice-video-position-y.hint'),
+		game.settings.register('stream-view', 'voice-video-border-color', {
+			name: game.i18n.localize('stream-view.settings.voice-video-border-color.name'),
+			hint: game.i18n.localize('stream-view.settings.voice-video-border-color.hint'),
 			scope: 'world',
 			config: true,
 			restricted: true,
-			default: -176,
-			type: Number,
+			default: true,
+			type: Boolean,
 		});
+
 
 		game.settings.register('stream-view', 'show-scene-navigation', {
 			name: game.i18n.localize('stream-view.settings.show-scene-navigation.name'),
@@ -430,21 +435,21 @@ class StreamView {
 		html.append(`<div id="${SpeechBubbles.containerId}"/>`);
 	}
 
-	static handleStreamCamera(html) {
+	static handleStreamAV(html) {
 		if (this.isStreamUser) {
 			if (!game.settings.get('stream-view', 'show-voice-video')) {
 				this.hideHtml(html);
 				return;
 			}
-			let posX = game.settings.get('stream-view', `voice-video-position-x`);
-			let posY = game.settings.get('stream-view', `voice-video-position-y`);
-			if (posX < 0) {
-				posX = window.innerWidth + posX;
+			const position = game.settings.get('stream-view', 'voice-video-position');
+			const pixels = `${game.settings.get('stream-view', 'voice-video-width')}px`;
+			const isVertical = [AVSettings.DOCK_POSITIONS.TOP, AVSettings.DOCK_POSITIONS.BOTTOM].includes(position);
+			html.css('--av-width', pixels);
+			if (isVertical) {
+				html.css('height', pixels);
+			} else {
+				html.css('width', pixels);
 			}
-			if (posY < 0) {
-				posY = window.innerHeight + posY;
-			}
-			html.css({ left: posX, top: posY, bottom: 'inherit' });
 		}
 
 		const streamCamera = html.find(
@@ -707,7 +712,7 @@ class StreamView {
 		if (combatant.hasPlayerOwner) {
 			canvas.templates.placeables.forEach((t) => {
 				combatant.players.forEach((p) => {
-					if (t.data.user === p.id) {
+					if (t.user === p.id) {
 						templates.push(t);
 					}
 				});
@@ -720,9 +725,9 @@ class StreamView {
 	_tokenCoords(tokens) {
 		const coords = [];
 		tokens.forEach((t) => {
-			// Use data.x here to avoid in-flight animated coords
-			coords.push({ x: t.data.x, y: t.data.y });
-			coords.push({ x: t.data.x + t.width, y: t.data.y + t.height });
+			// Use document.x here to avoid in-flight animated coords
+			coords.push({ x: t.document.x, y: t.document.y });
+			coords.push({ x: t.document.x, y: t.document.y + t.height });
 		});
 		return coords;
 	}
@@ -807,7 +812,7 @@ class StreamView {
 	}
 
 	async _bubblesUpdate(token, isSpeaking) {
-		if (!game.settings.get('stream-view', 'show-speech-bubbles')) {
+		if (!token || !game.settings.get('stream-view', 'show-speech-bubbles')) {
 			return;
 		}
 
@@ -959,7 +964,7 @@ class StreamView {
 				game.settings.get('stream-view', 'user-id'),
 				toggled
 			);
-		} catch(e) {
+		} catch (e) {
 			ui.notifications.warn(`Could not toggle Stream View foreground status (user not connected?)`);
 			return;
 		}
@@ -972,7 +977,7 @@ class StreamView {
 				game.settings.get('stream-view', 'user-id'),
 				toggled
 			);
-		} catch(e) {
+		} catch (e) {
 			ui.notifications.warn(`Could not toggle Stream View notes status (user not connected?)`);
 			return;
 		}
@@ -1126,13 +1131,23 @@ class StreamView {
 			rtcSettings.mode !== AVSettings.AV_MODES.DISABLED &&
 			game.settings.get('stream-view', 'show-voice-video')
 		) {
-			let pixels = game.settings.get('stream-view', 'voice-video-position-y');
-			if (pixels < 0) {
-				padding.bottom += pixels * -1;
-			} else {
-				padding.top +=
-					pixels +
-					StreamView._voiceVideoSizePixels[game.settings.get('stream-view', 'voice-video-size')];
+			const position = game.settings.get('stream-view', 'voice-video-position');
+			const pixels = game.settings.get('stream-view', 'voice-video-width');
+			switch (position) {
+				case AVSettings.DOCK_POSITIONS.LEFT:
+					padding.left += pixels;
+					break;
+				case AVSettings.DOCK_POSITIONS.RIGHT:
+					padding.right += pixels;
+					break;
+				case AVSettings.DOCK_POSITIONS.TOP:
+					padding.top += pixels;
+					break;
+				case AVSettings.DOCK_POSITIONS.BOTTOM:
+					padding.bottom += pixels;
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -1260,7 +1275,7 @@ class StreamView {
 			}
 
 			this._socket.executeForAllGMs('connected', game?.user?.id);
-		} catch {}
+		} catch { }
 
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1287,8 +1302,23 @@ class StreamView {
 		);
 		game.webrtc.settings.set(
 			'client',
-			'dockSize',
-			game.settings.get('stream-view', 'voice-video-size'),
+			'dockPosition',
+			game.settings.get('stream-view', 'voice-video-position'),
+		);
+		game.webrtc.settings.set(
+			'client',
+			'dockWidth',
+			game.settings.get('stream-view', 'voice-video-width'),
+		);
+		game.webrtc.settings.set(
+			'client',
+			'nameplates',
+			game.settings.get('stream-view', 'voice-video-nameplate-mode'),
+		);
+		game.webrtc.settings.set(
+			'client',
+			'borderColors',
+			game.settings.get('stream-view', 'voice-video-border-color'),
 		);
 
 		libWrapper.register(

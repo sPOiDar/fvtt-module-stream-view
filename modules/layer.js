@@ -1,6 +1,6 @@
 import { StreamViewOptions } from './options.js';
 
-export class StreamViewLayer extends CanvasLayer {
+export class StreamViewLayer extends InteractionLayer {
 	constructor() {
 		super();
 		this._previewData = {
@@ -9,23 +9,28 @@ export class StreamViewLayer extends CanvasLayer {
 			width: 0,
 			height: 0,
 		}
-		this._preview = this.addChild(new PIXI.Graphics());
+		this._createPreview();
 	}
 
 	static documentName = 'StreamViewLayer';
 
 	/** @override */
 	static get layerOptions() {
-		return mergeObject(super.layerOptions, {
-			canDragCreate: false,
+		return foundry.utils.mergeObject(super.layerOptions, {
+			name: "stream-view",
+			sortActiveTop: true,
 			zIndex: 999,
 		});
+	}
+
+	_createPreview() {
+		this._preview ||= this.addChild(new PIXI.Graphics());
 	}
 
 	_drawPreview({ x, y, width, height }) {
 		this._preview.clear();
 		const previewMode = game.settings.get('stream-view', 'preview-display');
-		if (previewMode === StreamViewOptions.PreviewDisplay.NEVER || (previewMode === StreamViewOptions.PreviewDisplay.LAYER && !this._active)) {
+		if (previewMode === StreamViewOptions.PreviewDisplay.NEVER || (previewMode === StreamViewOptions.PreviewDisplay.LAYER && !this.active)) {
 			return;
 		}
 		this._preview.beginFill(0x0000dd, 0.05)
@@ -35,33 +40,34 @@ export class StreamViewLayer extends CanvasLayer {
 	}
 
 	/** @override */
-	async draw() {
+	async _draw(options) {
 		this.interactiveChildren = false;
-		return this;
+		this._createPreview()
 	}
 
 	/** @override */
-	async tearDown() {
-		this._preview.clear();
-		return this;
+	async _tearDown(options) {
+		if (this._preview) {
+			this._preview.clear();
+		}
+		this._preview = undefined;
+		super._tearDown(options);
 	}
 
 	/** @override */
-	activate() {
-		super.activate();
+	_activate() {
+		super._activate();
 		if (game.settings.get('stream-view', 'preview-display') === StreamViewOptions.PreviewDisplay.LAYER) {
 			this._drawPreview(this._previewData);
 		}
-		return this;
 	}
 
 	/** @override */
-	deactivate() {
-		super.deactivate();
+	_deactivate() {
 		if (game.settings.get('stream-view', 'preview-display') === StreamViewOptions.PreviewDisplay.LAYER) {
 			this._preview.clear();
 		}
-		return this;
+		super._deactivate();
 	}
 
 	refresh() {

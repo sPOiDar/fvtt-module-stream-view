@@ -10,7 +10,7 @@ export class SpeechBubbles {
     this.template = "modules/stream-view/templates/speech-bubble.html";
   }
 
-	/* -------------------------------------------- */
+  /* -------------------------------------------- */
 
   /**
    * A reference to the speech bubbles HTML container in which rendered bubbles should live
@@ -20,7 +20,7 @@ export class SpeechBubbles {
     return $(`#${SpeechBubbles.containerId}`);
   }
 
-	/* -------------------------------------------- */
+  /* -------------------------------------------- */
 
   /**
    * Speak a message as a particular Token, displaying it as a speech bubble
@@ -34,10 +34,10 @@ export class SpeechBubbles {
     await this.hide(token);
 
     // Create the HTML and call the speechBubble hook
-    let html = $(await this._renderHTML({token}));
+    let html = $(await this._renderHTML({ token }));
 
     // Set initial dimensions
-    this._setPosition(token, html, {width: 32, height: 32});
+    this._setPosition(token, html, { width: 32, height: 32 });
 
     // Append to DOM
     this.container.append(html);
@@ -48,7 +48,7 @@ export class SpeechBubbles {
     });
   }
 
-	/* -------------------------------------------- */
+  /* -------------------------------------------- */
 
   /**
    * Clear any existing speech bubble for a certain Token
@@ -57,7 +57,7 @@ export class SpeechBubbles {
    */
   async hide(token) {
     let existing = $(`.speech-bubble[data-token-id="${token.id}"]`);
-    if ( !existing.length ) return;
+    if (!existing.length) return;
     return new Promise(resolve => {
       existing.fadeOut(100, () => {
         existing.remove();
@@ -66,7 +66,7 @@ export class SpeechBubbles {
     })
   }
 
-	/* -------------------------------------------- */
+  /* -------------------------------------------- */
 
   /**
    * Render the HTML template for the speech bubble
@@ -78,9 +78,9 @@ export class SpeechBubbles {
     return renderTemplate(this.template, data);
   }
 
-	/* -------------------------------------------- */
+  /* -------------------------------------------- */
 
-	/* -------------------------------------------- */
+  /* -------------------------------------------- */
 
   /**
    * Assign styling parameters to the speech bubble, toggling either a left or right display (randomly)

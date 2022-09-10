@@ -1,13 +1,22 @@
 {
+  "id": "stream-view",
   "name": "stream-view",
   "title": "Stream View",
   "description": "This module provides a minimal UI view with automated camera work, ideal for streaming or recording games.",
-  "author": [
-    "sPOiDar"
+  "authors": [
+    {
+      "name": "sPOiDar",
+      "url": "https://github.com/sPOiDar"
+    }
   ],
   "version": "0.4.4",
-  "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "9",
+  "minimumCoreVersion": "10",
+  "compatibleCoreVersion": "10",
+  "compatibility": {
+    "minimum": 10,
+    "verified": "10.285",
+    "maximum": 10
+  },
   "esmodules": [
     "modules/stream_view.js"
   ],
@@ -21,15 +30,25 @@
       "path": "lang/en.json"
     }
   ],
+  "relationships": {
+    "requires": [
+      {
+        "id": "lib-wrapper",
+        "compatibility": {
+          "minimum": "1.12.7.2",
+          "verified": "1.12.7.2"
+        }
+      },
+      {
+        "id": "socketlib",
+        "compatibility": {
+          "minimum": "1.0.10",
+          "verified": "1.0.10"
+        }
+      }
+    ]
+  },
   "socket": true,
-  "dependencies": [
-    {
-      "name": "lib-wrapper"
-    },
-    {
-      "name": "socketlib"
-    }
-  ],
   "license": "LICENSE",
   "readme": "README.md",
   "url": "https://github.com/sPOiDar/fvtt-module-stream-view",
