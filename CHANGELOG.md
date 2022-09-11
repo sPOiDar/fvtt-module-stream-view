@@ -1,3 +1,13 @@
+# [1.1.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.0.0...v1.1.0) (2022-09-11)
+
+
+### Features
+
+* **camera:** Add the ability to track specific tokens for auto camera ([375b7bb](https://github.com/sPOiDar/fvtt-module-stream-view/commit/375b7bb)), closes [#24](https://github.com/sPOiDar/fvtt-module-stream-view/issues/24)
+
+
+
+
 # [1.0.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v0.4.4...v1.0.0) (2022-09-10)
 
 
