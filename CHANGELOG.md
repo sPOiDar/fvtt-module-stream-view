@@ -1,3 +1,13 @@
+## [1.1.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.1.0...v1.1.1) (2022-09-11)
+
+
+### Bug Fixes
+
+* **translations:** Add missing translation for clear tracked tokens btn ([3f01a0d](https://github.com/sPOiDar/fvtt-module-stream-view/commit/3f01a0d))
+
+
+
+
 # [1.1.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.0.0...v1.1.0) (2022-09-11)
 
 

@@ -9,7 +9,7 @@
       "url": "https://github.com/sPOiDar"
     }
   ],
-  "version": "1.1.0",
+  "version": "1.1.1",
   "minimumCoreVersion": "10",
   "compatibleCoreVersion": "10",
   "compatibility": {
@@ -55,5 +55,5 @@
   "bugs": "https://github.com/sPOiDar/fvtt-module-stream-view/issues",
   "changelog": "https://github.com/sPOiDar/fvtt-module-stream-view/blob/master/CHANGELOG.md",
   "manifest": "https://github.com/sPOiDar/fvtt-module-stream-view/raw/master/module.json",
-  "download": "https://github.com/sPOiDar/fvtt-module-stream-view/releases/download/v1.1.0/stream-view-v1.1.0.zip"
+  "download": "https://github.com/sPOiDar/fvtt-module-stream-view/releases/download/v1.1.1/stream-view-v1.1.1.zip"
 }
