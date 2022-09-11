@@ -5,6 +5,11 @@ import { StreamViewOptions } from './options.js';
 class StreamView {
 	static _unknownUserId = 'unknownUser';
 	static _defaultUserChoices = { [this._unknownUserId]: '' };
+	static TOKEN_TRACKED_EFFECT = {
+		id: 'stream-view.token-tracked',
+		label: 'stream-view.controls.token-tracked',
+		icon: 'modules/stream-view/icons/video-solid.svg',
+	}
 
 	static start() {
 		const instance = new StreamView();
@@ -33,8 +38,12 @@ class StreamView {
 		});
 		Hooks.on('renderCameraViews', (_app, html) => this.handleStreamAV(html));
 		Hooks.on('renderHeadsUpDisplay', (_app, html) => this.appendSpeechBubblesContainer(html));
+		Hooks.on('renderTokenHUD', (_app, html, tokenHUD) => instance._handleTokenHUD(html, tokenHUD));
 		Hooks.on('renderSidebarTab', (app, html) => instance._handlePopout(app, html));
 		Hooks.on('renderUserConfig', (app, html) => instance._handlePopout(app, html));
+		Hooks.on('drawToken', (token) => instance._handleDrawToken(token));
+		Hooks.on('updateToken', (doc) => instance._handleUpdateToken(doc));
+		Hooks.on('destroyToken', (doc) => instance._handleDestroyToken(doc));
 		Hooks.once('ready', () => instance.ready());
 	}
 
@@ -43,6 +52,8 @@ class StreamView {
 			layerClass: StreamViewLayer,
 			group: "interface",
 		};
+
+		TextureLoader.loader.loadTexture(this.TOKEN_TRACKED_EFFECT.icon);
 
 		game.settings.register('stream-view', 'user-id', {
 			name: game.i18n.localize('stream-view.settings.user-id.name'),
@@ -497,6 +508,7 @@ class StreamView {
 		this._debounceAnimateTo = foundry.utils.debounce(this.animateTo.bind(this), 100);
 		this._notesStatus = false;
 		this._foregroundStatus = false;
+		this._trackedTokens = {};
 	}
 
 	_coordBounds(coords = []) {
@@ -904,6 +916,12 @@ class StreamView {
 					icon: 'far fa-window-restore',
 					onClick: () => this._sendClosePopouts(),
 				},
+				{
+					name: 'clear-tracked-tokens',
+					title: 'stream-view.controls.clear-tracked-tokeens',
+					icon: 'fas fa-video-slash',
+					onClick: () => this._clearTrackedTokens(),
+				},
 			],
 		});
 	}
@@ -1059,6 +1077,107 @@ class StreamView {
 		canvas.streamView.drawPreview({ x, y, width, height });
 	}
 
+	_clearTrackedTokens() {
+		this._trackedTokens[this._sceneId].forEach((t) => {
+			const token = game.canvas.tokens.get(t);
+			this._toggleTokenTracking(token, false);
+		});
+	}
+
+	_handleDrawToken(token) {
+		if (!game.user?.isGM) {
+			return;
+		}
+
+		token._streamViewContainer ||= token.addChild(new PIXI.Container());
+	}
+
+	_handleUpdateToken(doc) {
+		if (!StreamView.isStreamUser && !game.user?.isGM) {
+			return;
+		}
+
+		if (game.user.isGM) {
+			const token = game.canvas.tokens.get(doc.id);
+			this._toggleTokenTrackedIcon(token, this._tokenDocumentHasTracking(doc));
+		}
+
+		if (this._tokenDocumentHasTracking(doc)) {
+			this._trackedTokens[this._sceneId].add(doc.id);
+		} else {
+			this._trackedTokens[this._sceneId].delete(doc.id);
+		}
+
+		if (StreamView.isStreamUser) {
+			this.focusUpdate();
+		}
+	}
+
+	_handleDestroyToken(token) {
+		if (!StreamView.isStreamUser && !game.user?.isGM) {
+			return;
+		}
+
+		if (game.user?.isGM) {
+			this._toggleTokenTracking(token, false);
+		} else if (StreamView.isStreamUser) {
+			this.focusUpdate();
+		}
+	}
+
+	_tokenDocumentHasTracking(doc) {
+		return !!doc.getFlag('stream-view', 'tracked');
+	}
+
+	async _toggleTokenTrackedIcon(token, active) {
+		if (!game.user?.isGM) {
+			return;
+		}
+
+		token._streamViewContainer.removeChildren().forEach((c) => c.destroy());
+		if (active) {
+			const w = Math.round(canvas.dimensions.size / 2 / 4) * 2;
+			const tex = await loadTexture(StreamView.TOKEN_TRACKED_EFFECT.icon, { fallback: "icons/svg/hazard.svg" });
+			const icon = new PIXI.Sprite(tex);
+			icon.width = icon.height = w;
+			icon.x = token.w - w;
+			icon.y = (token.h / 2) - (w / 2);
+			token._streamViewContainer.addChild(icon);
+		}
+	}
+
+	_toggleTokenTracking(token, active) {
+		if (!token || !game.user?.isGM) {
+			return;
+		}
+
+		if (active) {
+			token.document.setFlag('stream-view', 'tracked', true);
+		} else {
+			token.document.unsetFlag('stream-view', 'tracked');
+		}
+	}
+
+	_handleTokenHUD(html, tokenHUD) {
+		if (!game.user?.isGM) {
+			return;
+		}
+
+		const token = game.canvas.tokens.get(tokenHUD._id);
+		const rightCol = html.find('div.col.right');
+		if (rightCol) {
+			const title = game.i18n.localize('stream-view.controls.token-track-toggle');
+			let isActive = this._tokenDocumentHasTracking(token.document);
+			const icon = $(`<div class="control-icon ${isActive ? 'active' : ''}"><i title="${title}" class="fas fa-video"></i></div>`);
+			icon.click(() => {
+				isActive = this._tokenDocumentHasTracking(token.document);
+				game.canvas.tokens.controlled.forEach((t) => this._toggleTokenTracking(t, !isActive));
+				icon.toggleClass('active');
+			});
+			rightCol.append(icon);
+		}
+	}
+
 	_handlePopout(app, html) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1109,7 +1228,7 @@ class StreamView {
 		}
 
 		const ids = [...this._popouts.keys()];
-		for (let id of ids) {
+		for (const id of ids) {
 			if (id === StreamViewOptions.PopoutIdentifiers.CHAT || id === StreamViewOptions.PopoutIdentifiers.COMBAT) {
 				continue;
 			}
@@ -1389,16 +1508,26 @@ class StreamView {
 	}
 
 	updateScene() {
-		if (!StreamView.isStreamUser || !game.canvas.scene) {
-			if (game.user.isGM) {
-				StreamView._previewRefresh();
-			}
+		if (!game.canvas.scene || (!StreamView.isStreamUser && !game.user.isGM)) {
 			return;
 		}
 
 		if (this._sceneId !== game.canvas.scene.id) {
 			this._sceneId = game.canvas.scene.id;
-			this.focusUpdate();
+			if (!this._trackedTokens[this._sceneId]) {
+				this._trackedTokens[this._sceneId] = new Set();
+				game.canvas.tokens.placeables.forEach((t) => {
+					if (this._tokenDocumentHasTracking(t.document)) {
+						this._trackedTokens[this._sceneId].add(t.id);
+						this._toggleTokenTrackedIcon(t, true);
+					}
+				});
+			}
+			if (StreamView.isStreamUser) {
+				this.focusUpdate();
+			} else if (game.user.isGM) {
+				StreamView._previewRefresh();
+			}
 		}
 	}
 
@@ -1446,7 +1575,17 @@ class StreamView {
 			return;
 		}
 
-		let tokens = this._speakingTokens();
+		let tokens = [];
+		if (this._trackedTokens[this._sceneId]?.size > 0) {
+			this._trackedTokens[this._sceneId].forEach((id) => {
+				const token = game.canvas.tokens.get(id);
+				if (token) {
+					tokens.push(token);
+				}
+			});
+		} else {
+			tokens = this._speakingTokens();
+		}
 		if (tokens.length === 0) {
 			tokens = this._playerTokens();
 		}
