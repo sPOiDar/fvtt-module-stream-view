@@ -1450,6 +1450,13 @@ class StreamView {
 			'WRAPPER',
 		);
 
+		libWrapper.register(
+			'stream-view',
+			'SoundsLayer.prototype.refresh',
+			(_wrapped, ..._args) => {},
+			'OVERRIDE',
+		);
+
 		if (game.settings.get('stream-view', 'show-chat') && !game.settings.get('stream-view', 'show-full-sidebar')) {
 			this.createPopout(StreamViewOptions.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
 		}
@@ -1504,6 +1511,7 @@ class StreamView {
 		if (game.settings.get('stream-view', 'preview-display') !== StreamViewOptions.PreviewDisplay.NEVER) {
 			this._sendCameraPreview({ x, y, scale });
 		}
+		canvas.getLayerByEmbeddedName(CONFIG.AmbientSound.objectClass.name).previewSound({x, y});
 		return canvas.animatePan({ x, y, scale, duration });
 	}
 
