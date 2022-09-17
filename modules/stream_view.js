@@ -82,6 +82,16 @@ class StreamView {
 			type: String,
 		});
 
+		game.settings.register('stream-view', 'disable-combatant-tracking', {
+			name: game.i18n.localize('stream-view.settings.disable-combatant-tracking.name'),
+			hint: game.i18n.localize('stream-view.settings.disable-combatant-tracking.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'directed-combat', {
 			name: game.i18n.localize('stream-view.settings.directed-combat.name'),
 			hint: game.i18n.localize('stream-view.settings.directed-combat.hint'),
@@ -1653,7 +1663,7 @@ class StreamView {
 		}
 
 		const tokens = this._combatTokens(combat);
-		if (tokens.length === 0) {
+		if (game.settings.get('stream-view', 'disable-combatant-tracking') || tokens.length === 0) {
 			this.focusPlayers();
 			return;
 		}
