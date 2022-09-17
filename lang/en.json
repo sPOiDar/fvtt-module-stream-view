@@ -1,9 +1,11 @@
 {
 	"stream-view.controls.toggle-camera-mode": "Toggle Camera Mode",
+	"stream-view.controls.toggle-foreground-layer": "Toggle Foreground Layer",
 	"stream-view.controls.close-popouts": "Close Popouts",
 	"stream-view.controls.token-track-toggle": "Track on Stream",
 	"stream-view.controls.token-tracked": "Tracked on Stream",
-	"stream-view.controls.clear-tracked-tokens": "Clear Tracked Tokens",
+	"stream-view.controls.token-tracked-clear": "Clear Tracked Tokens",
+	"stream-view.controls.token-tracked-enable": "Track Selected Tokens",
 	"stream-view.settings.user-id.name": "Stream User (required)",
 	"stream-view.settings.user-id.hint": "Select the user that will display the Stream View. This user should be assigned 'Observer' permission for all player characters. Log in as this user in a browser source to stream it.",
 	"stream-view.settings.camera-mode.name": "Camera Mode",

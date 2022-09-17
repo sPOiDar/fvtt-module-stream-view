@@ -55,6 +55,7 @@ class StreamView {
 
 		TextureLoader.loader.loadTexture(this.TOKEN_TRACKED_EFFECT.icon);
 
+		// Settings
 		game.settings.register('stream-view', 'user-id', {
 			name: game.i18n.localize('stream-view.settings.user-id.name'),
 			hint: game.i18n.localize('stream-view.settings.user-id.hint'),
@@ -435,6 +436,49 @@ class StreamView {
 			restricted: true,
 			default: false,
 			type: Boolean,
+		});
+	
+		// Keybinds
+		game.keybindings.register('stream-view', 'camera-mode-toggle', {
+			name: game.i18n.localize('stream-view.controls.toggle-camera-mode'),
+			onDown: () => instance._toggleCameraMode(),
+			restricted: true,
+			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+		});
+
+		game.keybindings.register('stream-view', 'token-tracked-enable', {
+			name: game.i18n.localize('stream-view.controls.token-tracked-enable'),
+			onDown: () => instance._toggleControlledTokenTracking(true),
+			restricted: true,
+			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+		});
+
+		game.keybindings.register('stream-view', 'token-tracked-clear', {
+			name: game.i18n.localize('stream-view.controls.token-tracked-clear'),
+			onDown: () => instance._clearTrackedTokens(),
+			restricted: true,
+			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+		});
+
+		game.keybindings.register('stream-view', 'toggle-foreground-layer', {
+			name: game.i18n.localize('stream-view.controls.toggle-foreground-layer'),
+			onDown: () => instance._sendToggleForeground(!this._foregroundStatus),
+			restricted: true,
+			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+		});
+
+		game.keybindings.register('stream-view', 'toggle-notes-layer', {
+			name: game.i18n.localize('CONTROLS.NoteToggle'),
+			onDown: () => instance._sendToggleNotes(!this._notesStatus),
+			restricted: true,
+			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+		});
+
+		game.keybindings.register('stream-view', 'close-popouts', {
+			name: game.i18n.localize('stream-view.controls.close-popouts'),
+			onDown: () => instance._sendClosePopouts(),
+			restricted: true,
+			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 		});
 	}
 
@@ -896,11 +940,11 @@ class StreamView {
 				},
 				{
 					name: "foreground",
-					title: "CONTROLS.TileForeground",
+					title: "stream-view.controls.toggle-foreground-layer",
 					icon: "fas fa-home",
 					toggle: true,
 					active: this._foregroundStatus,
-					onClick: (toggled) => this._sendToggleForeground(toggled),
+					onClick: () => this._sendToggleForeground(!this._foregroundStatus),
 				},
 				{
 					name: "toggle",
@@ -908,7 +952,7 @@ class StreamView {
 					icon: "fas fa-map-pin",
 					toggle: true,
 					active: this._notesStatus,
-					onClick: (toggled) => this._sendToggleNotes(toggled),
+					onClick: () => this._sendToggleNotes(!this._notesStatus),
 				},
 				{
 					name: 'close-popouts',
@@ -917,8 +961,8 @@ class StreamView {
 					onClick: () => this._sendClosePopouts(),
 				},
 				{
-					name: 'clear-tracked-tokens',
-					title: 'stream-view.controls.clear-tracked-tokens',
+					name: 'token-tracked-clear',
+					title: 'stream-view.controls.token-tracked-clear',
 					icon: 'fas fa-video-slash',
 					onClick: () => this._clearTrackedTokens(),
 				},
@@ -1158,6 +1202,10 @@ class StreamView {
 		}
 	}
 
+	_toggleControlledTokenTracking(active) {
+		game.canvas.tokens.controlled.forEach((t) => this._toggleTokenTracking(t, active));
+	}
+
 	_handleTokenHUD(html, tokenHUD) {
 		if (!game.user?.isGM) {
 			return;
@@ -1170,8 +1218,7 @@ class StreamView {
 			let isActive = this._tokenDocumentHasTracking(token.document);
 			const icon = $(`<div class="control-icon ${isActive ? 'active' : ''}"><i title="${title}" class="fas fa-video"></i></div>`);
 			icon.click(() => {
-				isActive = this._tokenDocumentHasTracking(token.document);
-				game.canvas.tokens.controlled.forEach((t) => this._toggleTokenTracking(t, !isActive));
+				this._toggleControlledTokenTracking(!this._tokenDocumentHasTracking(token.document));
 				icon.toggleClass('active');
 			});
 			rightCol.append(icon);
