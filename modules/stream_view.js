@@ -248,6 +248,56 @@ class StreamView {
 			type: Number,
 		});
 
+		game.settings.register('stream-view', 'popout-position-fixed', {
+			name: game.i18n.localize('stream-view.settings.popout-position-fixed.name'),
+			hint: game.i18n.localize('stream-view.settings.popout-position-fixed.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
+		game.settings.register('stream-view', 'popout-position-x', {
+			name: game.i18n.localize('stream-view.settings.popout-position-x.name'),
+			hint: game.i18n.localize('stream-view.settings.popout-position-x.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 60,
+			type: Number,
+		});
+
+		game.settings.register('stream-view', 'popout-position-y', {
+			name: game.i18n.localize('stream-view.settings.popout-position-y.name'),
+			hint: game.i18n.localize('stream-view.settings.popout-position-y.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 120,
+			type: Number,
+		});
+
+		game.settings.register('stream-view', 'popout-width', {
+			name: game.i18n.localize('stream-view.settings.popout-width.name'),
+			hint: game.i18n.localize('stream-view.settings.popout-width.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 400,
+			type: Number,
+		});
+
+		game.settings.register('stream-view', 'popout-height', {
+			name: game.i18n.localize('stream-view.settings.popout-height.name'),
+			hint: game.i18n.localize('stream-view.settings.popout-height.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 600,
+			type: Number,
+		});
+
 		game.settings.register('stream-view', 'show-voice-video', {
 			name: game.i18n.localize('stream-view.settings.show-voice-video.name'),
 			hint: game.i18n.localize('stream-view.settings.show-voice-video.hint'),
@@ -538,6 +588,29 @@ class StreamView {
 			return;
 		}
 		html.children('header.window-header').hide();
+	}
+
+	static setPopoutPosition(html) {
+		if (!game.settings.get('stream-view', 'popout-position-fixed')) {
+			return;
+		}
+		const x = game.settings.get('stream-view', `popout-position-x`);
+		const y = game.settings.get('stream-view', `popout-position-y`);
+		const width = game.settings.get('stream-view', `popout-width`);
+		const height = game.settings.get('stream-view', `popout-height`);
+
+		if (y < 0) {
+			html.css('bottom', y * -1);
+		} else {
+			html.css('top', y);
+		}
+		if (x < 0) {
+			html.css('right', x * -1);
+		} else {
+			html.css('left', x);
+		}
+		html.css('width', `${width}px`);
+		html.css('height', `${height}px`);
 	}
 
 	static isCombatActive(combat) {
@@ -1271,6 +1344,7 @@ class StreamView {
 		}
 
 		StreamView.hidePopoutHeaders(html);
+		StreamView.setPopoutPosition(html);
 		const autoClose = game.settings.get('stream-view', 'popout-auto-close-duration');
 		this._popouts.set(app.id, app);
 		if (autoClose === 0) {
