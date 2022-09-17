@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.1.1...v1.2.0) (2022-09-17)
+
+
+### Features
+
+* **audio:** Play ambient sounds for the stream view from camera center ([d9493b2](https://github.com/sPOiDar/fvtt-module-stream-view/commit/d9493b2)), closes [#26](https://github.com/sPOiDar/fvtt-module-stream-view/issues/26)
+* **core:** Allow disabling of combatant tracking ([b7a1cde](https://github.com/sPOiDar/fvtt-module-stream-view/commit/b7a1cde)), closes [#31](https://github.com/sPOiDar/fvtt-module-stream-view/issues/31)
+* **keybinds:** Enable keybinds for most useful functionality ([ee89719](https://github.com/sPOiDar/fvtt-module-stream-view/commit/ee89719)), closes [#13](https://github.com/sPOiDar/fvtt-module-stream-view/issues/13)
+* **popouts:** Allow setting popouts to a fixed size/position ([0dfd3b1](https://github.com/sPOiDar/fvtt-module-stream-view/commit/0dfd3b1)), closes [#28](https://github.com/sPOiDar/fvtt-module-stream-view/issues/28)
+
+
+
+
 ## [1.1.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.1.0...v1.1.1) (2022-09-11)
 
 
