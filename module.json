@@ -13,9 +13,9 @@
   "minimumCoreVersion": "10",
   "compatibleCoreVersion": "10",
   "compatibility": {
-    "minimum": 10,
-    "verified": "10.285",
-    "maximum": 10
+    "minimum": "10",
+    "verified": "10",
+    "maximum": "10"
   },
   "esmodules": [
     "modules/stream_view.js"
