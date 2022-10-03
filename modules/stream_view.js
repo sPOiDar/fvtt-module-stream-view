@@ -22,8 +22,8 @@ class StreamView {
 			if (!game.settings.get('stream-view', 'show-scene-navigation')) {
 				this.hideHtml(html);
 			}
-			instance.updateScene();
 		});
+		Hooks.on('canvasReady', () => instance.updateScene());
 		Hooks.on('renderPlayerList', (_app, html) => {
 			if (!game.settings.get('stream-view', 'show-player-list')) {
 				this.hideHtml(html);
@@ -43,7 +43,7 @@ class StreamView {
 		Hooks.on('renderUserConfig', (app, html) => instance._handlePopout(app, html));
 		Hooks.on('drawToken', (token) => instance._handleDrawToken(token));
 		Hooks.on('updateToken', (doc) => instance._handleUpdateToken(doc));
-		Hooks.on('destroyToken', (doc) => instance._handleDestroyToken(doc));
+		Hooks.on('deleteToken', (doc) => instance._handleDeleteToken(doc));
 		Hooks.once('ready', () => instance.ready());
 	}
 
@@ -497,7 +497,7 @@ class StreamView {
 			default: false,
 			type: Boolean,
 		});
-	
+
 		// Keybinds
 		game.keybindings.register('stream-view', 'camera-mode-toggle', {
 			name: game.i18n.localize('stream-view.controls.toggle-camera-mode'),
@@ -1226,7 +1226,9 @@ class StreamView {
 
 		if (game.user.isGM) {
 			const token = game.canvas.tokens.get(doc.id);
-			this._toggleTokenTrackedIcon(token, this._tokenDocumentHasTracking(doc));
+			if (token) {
+				this._toggleTokenTrackedIcon(token, this._tokenDocumentHasTracking(doc));
+			}
 		}
 
 		if (this._tokenDocumentHasTracking(doc)) {
@@ -1240,14 +1242,13 @@ class StreamView {
 		}
 	}
 
-	_handleDestroyToken(token) {
+	_handleDeleteToken(token) {
 		if (!StreamView.isStreamUser && !game.user?.isGM) {
 			return;
 		}
 
-		if (game.user?.isGM) {
-			this._toggleTokenTracking(token, false);
-		} else if (StreamView.isStreamUser) {
+		this._trackedTokens[this._sceneId].delete(token.id);
+		if (StreamView.isStreamUser) {
 			this.focusUpdate();
 		}
 	}
@@ -1261,6 +1262,7 @@ class StreamView {
 			return;
 		}
 
+		this._handleDrawToken(token);
 		token._streamViewContainer.removeChildren().forEach((c) => c.destroy());
 		if (active) {
 			const w = Math.round(canvas.dimensions.size / 2 / 4) * 2;
@@ -1531,7 +1533,6 @@ class StreamView {
 			return;
 		}
 
-		Hooks.on('updateToken', () => this.focusUpdate());
 		Hooks.on('targetToken', () => this.focusUpdate());
 		Hooks.on('createMeasuredTemplate', () => this.focusUpdate());
 		Hooks.on('updateMeasuredTemplate', () => this.focusUpdate());
@@ -1584,7 +1585,7 @@ class StreamView {
 		libWrapper.register(
 			'stream-view',
 			'SoundsLayer.prototype.refresh',
-			(_wrapped, ..._args) => {},
+			(_wrapped, ..._args) => { },
 			'OVERRIDE',
 		);
 
@@ -1642,7 +1643,7 @@ class StreamView {
 		if (game.settings.get('stream-view', 'preview-display') !== StreamViewOptions.PreviewDisplay.NEVER) {
 			this._sendCameraPreview({ x, y, scale });
 		}
-		canvas.getLayerByEmbeddedName(CONFIG.AmbientSound.objectClass.name).previewSound({x, y});
+		canvas.getLayerByEmbeddedName(CONFIG.AmbientSound.objectClass.name).previewSound({ x, y });
 		return canvas.animatePan({ x, y, scale, duration });
 	}
 
@@ -1651,22 +1652,24 @@ class StreamView {
 			return;
 		}
 
-		if (this._sceneId !== game.canvas.scene.id) {
-			this._sceneId = game.canvas.scene.id;
-			if (!this._trackedTokens[this._sceneId]) {
-				this._trackedTokens[this._sceneId] = new Set();
-				game.canvas.tokens.placeables.forEach((t) => {
-					if (this._tokenDocumentHasTracking(t.document)) {
-						this._trackedTokens[this._sceneId].add(t.id);
-						this._toggleTokenTrackedIcon(t, true);
-					}
-				});
+		if (this._sceneId === game.canvas.scene.id) {
+			return;
+		}
+
+		this._sceneId = game.canvas.scene.id;
+		if (!this._trackedTokens[this._sceneId]) {
+			this._trackedTokens[this._sceneId] = new Set();
+		}
+		game.canvas.tokens.placeables.forEach((t) => {
+			if (this._tokenDocumentHasTracking(t.document)) {
+				this._trackedTokens[this._sceneId].add(t.id);
+				this._toggleTokenTrackedIcon(t, true);
 			}
-			if (StreamView.isStreamUser) {
-				this.focusUpdate();
-			} else if (game.user.isGM) {
-				StreamView._previewRefresh();
-			}
+		});
+		if (StreamView.isStreamUser) {
+			this.focusUpdate();
+		} else if (game.user.isGM) {
+			StreamView._previewRefresh();
 		}
 	}
 
