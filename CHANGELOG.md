@@ -1,3 +1,13 @@
+## [1.2.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.2.1...v1.2.2) (2022-10-03)
+
+
+### Bug Fixes
+
+* **metadata:** Set verified version to "10" ([1419b3a](https://github.com/sPOiDar/fvtt-module-stream-view/commit/1419b3a))
+
+
+
+
 ## [1.2.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.2.0...v1.2.1) (2022-10-03)
 
 
