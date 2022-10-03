@@ -1,3 +1,13 @@
+## [1.2.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.2.0...v1.2.1) (2022-10-03)
+
+
+### Bug Fixes
+
+* **core:** Correct handling of tracked icon rendering on scene change ([0cde1b0](https://github.com/sPOiDar/fvtt-module-stream-view/commit/0cde1b0)), closes [#36](https://github.com/sPOiDar/fvtt-module-stream-view/issues/36)
+
+
+
+
 # [1.2.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.1.1...v1.2.0) (2022-09-17)
 
 
