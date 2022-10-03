@@ -520,13 +520,6 @@ class StreamView {
 			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 		});
 
-		game.keybindings.register('stream-view', 'toggle-foreground-layer', {
-			name: game.i18n.localize('stream-view.controls.toggle-foreground-layer'),
-			onDown: () => instance._sendToggleForeground(!this._foregroundStatus),
-			restricted: true,
-			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
-		});
-
 		game.keybindings.register('stream-view', 'toggle-notes-layer', {
 			name: game.i18n.localize('CONTROLS.NoteToggle'),
 			onDown: () => instance._sendToggleNotes(!this._notesStatus),
@@ -634,7 +627,6 @@ class StreamView {
 		this._sceneId = null;
 		this._debounceAnimateTo = foundry.utils.debounce(this.animateTo.bind(this), 100);
 		this._notesStatus = false;
-		this._foregroundStatus = false;
 		this._trackedTokens = {};
 	}
 
@@ -1022,14 +1014,6 @@ class StreamView {
 					onClick: () => this._toggleCameraMode(),
 				},
 				{
-					name: "foreground",
-					title: "stream-view.controls.toggle-foreground-layer",
-					icon: "fas fa-home",
-					toggle: true,
-					active: this._foregroundStatus,
-					onClick: () => this._sendToggleForeground(!this._foregroundStatus),
-				},
-				{
 					name: "toggle",
 					title: "CONTROLS.NoteToggle",
 					icon: "fas fa-map-pin",
@@ -1070,18 +1054,6 @@ class StreamView {
 		ui.notifications.info('Stream View popouts closed');
 	}
 
-	async _sendGetForegroundStatus() {
-		try {
-			const fgStatus = await this._socket.executeAsUser(
-				'getForegroundStatus',
-				game.settings.get('stream-view', 'user-id')
-			);
-			this._foregroundStatus = fgStatus;
-		} catch {
-			return;
-		}
-	}
-
 	async _sendGetNotesStatus() {
 		try {
 			this._notesStatus = await this._socket.executeAsUser(
@@ -1093,26 +1065,8 @@ class StreamView {
 		}
 	}
 
-	_getForegroundStatus() {
-		// TODO: Remove alpha check if foundry is updated to correctly reflect the layer status for non-GM users.
-		return (canvas.foreground?._active ?? false) || canvas.foreground?.alpha == 1
-	}
-
 	_getNotesStatus() {
 		return game.settings.get("core", NotesLayer.TOGGLE_SETTING)
-	}
-
-	async _sendToggleForeground(toggled) {
-		try {
-			this._foregroundStatus = await this._socket.executeAsUser(
-				'toggleForeground',
-				game.settings.get('stream-view', 'user-id'),
-				toggled
-			);
-		} catch (e) {
-			ui.notifications.warn(`Could not toggle Stream View foreground status (user not connected?)`);
-			return;
-		}
 	}
 
 	async _sendToggleNotes(toggled) {
@@ -1126,11 +1080,6 @@ class StreamView {
 			ui.notifications.warn(`Could not toggle Stream View notes status (user not connected?)`);
 			return;
 		}
-	}
-
-	_toggleForeground(toggled) {
-		canvas[toggled ? "foreground" : "background"].activate()
-		return this._getForegroundStatus()
 	}
 
 	_toggleNotes(toggled) {
@@ -1435,7 +1384,6 @@ class StreamView {
 	_socketConnected(userId) {
 		if (userId == game.settings.get('stream-view', 'user-id')) {
 			this._sendGetNotesStatus();
-			this._sendGetForegroundStatus();
 		}
 	}
 
@@ -1446,9 +1394,7 @@ class StreamView {
 		socket.register('setCameraMode', this._setCameraMode.bind(this));
 		socket.register('closePopouts', this._closePopouts.bind(this));
 		socket.register('previewCamera', this._previewCamera.bind(this));
-		socket.register('toggleForeground', this._toggleForeground.bind(this));
 		socket.register('toggleNotes', this._toggleNotes.bind(this));
-		socket.register('getForegroundStatus', this._getForegroundStatus.bind(this));
 		socket.register('getNotesStatus', this._getNotesStatus.bind(this));
 		this._socket = socket;
 	}
@@ -1523,7 +1469,6 @@ class StreamView {
 		try {
 			if (game?.user?.isGM) {
 				this._sendGetNotesStatus();
-				this._sendGetForegroundStatus();
 			}
 
 			this._socket.executeForAllGMs('connected', game?.user?.id);
