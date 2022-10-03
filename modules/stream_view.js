@@ -1084,9 +1084,9 @@ class StreamView {
 
 	_toggleNotes(toggled) {
 		const currentLayer = canvas.activeLayer.options.name;
-		canvas.activateLayer(NotesLayer.layerOptions.name);
+		canvas[NotesLayer.layerOptions.name]?.activate();
 		game.settings.set("core", NotesLayer.TOGGLE_SETTING, toggled)
-		canvas.activateLayer(currentLayer);
+		canvas[currentLayer].activate();
 		return this._getNotesStatus()
 	}
 
