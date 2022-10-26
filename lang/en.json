@@ -27,6 +27,8 @@
 	"stream-view.settings.disable-combatant-tracking.hint": "If set, disables automatic camera tracking of the current combatant during combat.",
 	"stream-view.settings.directed-combat.name": "Directed Combat",
 	"stream-view.settings.directed-combat.hint": "If enabled, during combat the Stream View camera will follow the view of the current combatant.",
+	"stream-view.settings.select-combatant.name": "Select current combtant",
+	"stream-view.settings.select-combatant.hint": "If enabled, during combat the Stream View will select the current combatant's token.  This will only work if the stream user has ownership of the token.",
 	"stream-view.settings.show-speech-bubbles.name": "Show Speech Bubbles",
 	"stream-view.settings.show-speech-bubbles.hint": "If using in-game voice chat, a speech bubble will appear above the token of the currently speaking user.",
 	"stream-view.settings.pan-on-user-speaking.name": "Focus on Speaking Token",

@@ -103,6 +103,16 @@ class StreamView {
 			type: Boolean,
 		});
 
+		game.settings.register('stream-view', 'select-combatant', {
+			name: game.i18n.localize('stream-view.settings.select-combatant.name'),
+			hint: game.i18n.localize('stream-view.settings.select-combatant.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'maximum-scale', {
 			name: game.i18n.localize('stream-view.settings.maximum-scale.name'),
 			hint: game.i18n.localize('stream-view.settings.maximum-scale.hint'),
@@ -1692,6 +1702,10 @@ class StreamView {
 
 		const panToToken = () => {
 			const tokens = this._combatTokens(combat);
+
+			if (game.settings.get('stream-view', 'select-combatant'))
+				tokens.forEach(tkn => tkn.control({releaseOthers: false}));
+
 			if (game.settings.get('stream-view', 'disable-combatant-tracking') || tokens.length === 0) {
 				this.focusPlayers();
 				return;
