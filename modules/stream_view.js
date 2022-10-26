@@ -41,6 +41,7 @@ class StreamView {
 		Hooks.on('renderTokenHUD', (_app, html, tokenHUD) => instance._handleTokenHUD(html, tokenHUD));
 		Hooks.on('renderSidebarTab', (app, html) => instance._handlePopout(app, html));
 		Hooks.on('renderUserConfig', (app, html) => instance._handlePopout(app, html));
+		Hooks.on('createToken', (doc) => instance._handleCreateToken(doc));
 		Hooks.on('drawToken', (token) => instance._handleDrawToken(token));
 		Hooks.on('updateToken', (doc) => instance._handleUpdateToken(doc));
 		Hooks.on('deleteToken', (doc) => instance._handleDeleteToken(doc));
@@ -1271,6 +1272,11 @@ class StreamView {
 			this._toggleTokenTracking(token, false);
 		});
 		ui.notifications.info('Stream View tracked tokens cleared');
+	}
+
+	_handleCreateToken(doc) {
+		if (StreamView.isStreamUser && game.canvas.tokens.get(doc.id))
+			this.focusUpdate();
 	}
 
 	_handleDrawToken(token) {
