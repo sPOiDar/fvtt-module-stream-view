@@ -1690,14 +1690,27 @@ class StreamView {
 			return;
 		}
 
-		const tokens = this._combatTokens(combat);
-		if (game.settings.get('stream-view', 'disable-combatant-tracking') || tokens.length === 0) {
-			this.focusPlayers();
-			return;
+		const panToToken = () => {
+			const tokens = this._combatTokens(combat);
+			if (game.settings.get('stream-view', 'disable-combatant-tracking') || tokens.length === 0) {
+				this.focusPlayers();
+				return;
+			}
+			const coords = this._tokenCoords(tokens);
+			coords.push(...this._measuredTemplateCoords(this._combatMeasuredTemplates(combat)));
+			this.animateTo(this._coordBounds(coords));
 		}
-		const coords = this._tokenCoords(tokens);
-		coords.push(...this._measuredTemplateCoords(this._combatMeasuredTemplates(combat)));
-		this.animateTo(this._coordBounds(coords));
+
+		// Need to release all tokens so that _combatTokens() correctly detects visible tokens.
+		const nReleased = game.canvas.tokens.releaseAll();
+
+		// Must wait for a sight refresh after releaseAll has been called.
+		if (0 != nReleased) {
+			Hooks.once("sightRefresh", panToToken);
+		}
+		else {
+			panToToken();
+		}
 	}
 }
 
