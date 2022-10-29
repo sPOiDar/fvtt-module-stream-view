@@ -1676,6 +1676,7 @@ class StreamView {
 		if (tokens.length === 0) {
 			tokens = this._playerTokens();
 		}
+		tokens = tokens.filter((t) => t.visible);
 		this.animateTo(this._coordBounds(this._tokenCoords(tokens)));
 	}
 
