@@ -25,6 +25,8 @@
 	"stream-view.settings.preview-display.option.layer": "Stream Layer Only",
 	"stream-view.settings.disable-combatant-tracking.name": "Disable Combatant Tracking",
 	"stream-view.settings.disable-combatant-tracking.hint": "If set, disables automatic camera tracking of the current combatant during combat.",
+	"stream-view.settings.track-invisible-players.name": "Track Invisible Players",
+	"stream-view.settings.track-invisible-players.hint": "If set, will keep PCs set to invisible (by a GM) within the camera bounds.",
 	"stream-view.settings.directed-combat.name": "Directed Combat",
 	"stream-view.settings.directed-combat.hint": "If enabled, during combat the Stream View camera will follow the view of the current combatant.",
 	"stream-view.settings.show-speech-bubbles.name": "Show Speech Bubbles",
