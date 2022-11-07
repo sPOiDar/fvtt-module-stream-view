@@ -218,6 +218,16 @@ class StreamView {
 			type: Number,
 		});
 
+		game.settings.register('stream-view', 'chat-max-height', {
+			name: game.i18n.localize('stream-view.settings.chat-max-height.name'),
+			hint: game.i18n.localize('stream-view.settings.chat-max-height.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 0,
+			type: Number,
+		});
+
 		game.settings.register('stream-view', 'auto-show-combat', {
 			name: game.i18n.localize('stream-view.settings.auto-show-combat.name'),
 			hint: game.i18n.localize('stream-view.settings.auto-show-combat.hint'),
@@ -1477,6 +1487,20 @@ class StreamView {
 		if (!StreamView.isStreamUser) {
 			return;
 		}
+
+		libWrapper.register(
+			'stream-view',
+			'ChatLog.prototype._renderInner',
+			async (wrapped, ...args) => {
+				let html = await wrapped(...args);
+				let maxHeight = game.settings.get('stream-view', 'chat-max-height');
+				if (maxHeight > 0) {
+					html.css('max-height', `${maxHeight}px`);
+				}
+				return html;
+			},
+			'WRAPPER',
+		);
 
 		Hooks.on('targetToken', () => this.focusUpdate());
 		Hooks.on('createMeasuredTemplate', () => this.focusUpdate());
