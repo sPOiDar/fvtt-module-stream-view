@@ -629,6 +629,7 @@ class StreamView {
 	}
 
 	constructor() {
+		this._enabled = true;
 		this._speechBubbles = new SpeechBubbles();
 		this._socket = undefined;
 		this._cameraMode = StreamViewOptions.CameraMode.AUTOMATIC;
@@ -722,6 +723,7 @@ class StreamView {
 
 	get _isAutoCamera() {
 		return (
+			this._enabled &&
 			this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC &&
 			!(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
 		);
@@ -729,6 +731,7 @@ class StreamView {
 
 	get _isDirectedCamera() {
 		return (
+			this._enabled &&
 			this._cameraMode === StreamViewOptions.CameraMode.DIRECTED ||
 			(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
 		);
@@ -1033,6 +1036,14 @@ class StreamView {
 					onClick: () => this._sendToggleNotes(!this._notesStatus),
 				},
 				{
+					name: "enable-disable",
+					title: "stream-view.controls.enable-disable",
+					icon: "fas fa-ban",
+					toggle: true,
+					active: !this._enabled,
+					onClick: () => this._enableDisable(!this._enabled)
+				},
+				{
 					name: 'close-popouts',
 					title: 'stream-view.controls.close-popouts',
 					icon: 'far fa-window-restore',
@@ -1117,7 +1128,7 @@ class StreamView {
 
 	}
 
-	async _setCameraMode(mode) {
+	async _setCameraMode(mode, showNotice = true) {
 		this._cameraMode = mode;
 
 		if (StreamView.isStreamUser) {
@@ -1125,10 +1136,10 @@ class StreamView {
 			return;
 		}
 
-		await this._setGMCameraMode(mode);
+		await this._setGMCameraMode(mode, showNotice);
 	}
 
-	async _setGMCameraMode(mode) {
+	async _setGMCameraMode(mode, shownotice = true) {
 		if (!game.user.isGM || !this._socket) {
 			return;
 		}
@@ -1151,9 +1162,36 @@ class StreamView {
 				scale: canvas.stage.scale.x,
 			});
 		}
-		ui.notifications.info(
-			`Stream View camera mode is now ${StreamViewOptions.localizeCameraMode(this._cameraMode)}`,
-		);
+
+		if (shownotice) {
+			ui.notifications.info(
+				`Stream View camera mode is now ${StreamViewOptions.localizeCameraMode(this._cameraMode)}`,
+			);
+		}
+	}
+
+	async _enableDisable(enabled) {
+		this._enabled = enabled;
+
+		if (game.user.isGM && this._socket) {
+			try {
+				await this._socket.executeAsUser(
+					'enableDisable',
+					game.settings.get('stream-view', 'user-id'),
+					enabled,
+				);
+			} catch {
+				ui.notifications.warn(`Stream View not dynamically updated (user not connected?)`);
+				return;
+			}
+
+			if (this._enabled)
+				this._setCameraMode(this._cameraMode, false);
+
+			ui.notifications.info(
+				`Stream View camera is now ${game.i18n.localize(`stream-view.settings.camera-mode.${this._enabled ? "enabled" : "disabled"}`)}`
+			);
+		}
 	}
 
 	_previewCamera({ x, y, width, height }) {
@@ -1408,6 +1446,7 @@ class StreamView {
 		socket.register('controlledToken', this._controlledToken.bind(this));
 		socket.register('animateTo', this._debounceAnimateTo.bind(this));
 		socket.register('setCameraMode', this._setCameraMode.bind(this));
+		socket.register('enableDisable', this._enableDisable.bind(this));
 		socket.register('closePopouts', this._closePopouts.bind(this));
 		socket.register('previewCamera', this._previewCamera.bind(this));
 		socket.register('toggleNotes', this._toggleNotes.bind(this));
