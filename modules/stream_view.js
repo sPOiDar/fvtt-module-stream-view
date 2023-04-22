@@ -53,8 +53,6 @@ class StreamView {
 			group: "interface",
 		};
 
-		TextureLoader.loader.loadTexture(this.TOKEN_TRACKED_EFFECT.icon);
-
 		// Settings
 		game.settings.register('stream-view', 'user-id', {
 			name: game.i18n.localize('stream-view.settings.user-id.name'),
@@ -1269,7 +1267,8 @@ class StreamView {
 
 		if (app instanceof ChatLog) {
 			// Extract chat log body.
-			html.find('section.sidebar-tab').replaceWith(html.find('ol#chat-log'));
+			html.find('#chat-controls').remove();
+			html.find('#chat-form').remove();
 			StreamView.hidePopoutHeaders(html);
 			return;
 		} else if (app instanceof CombatTracker) {
