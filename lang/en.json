@@ -63,6 +63,8 @@
 	"stream-view.settings.popout-height.hint": "Height for popouts in fixed mode.",
 	"stream-view.settings.show-voice-video.name": "Show Voice/Video Bar",
 	"stream-view.settings.show-voice-video.hint": "Show voice/video bar on Stream View.",
+	"stream-view.settings.voice-video-hide-stream-user.name": "Hide voice/video Stream user",
+	"stream-view.settings.voice-video-hide-stream-user.hint": "Hide voice/video Stream user on the voice/video bar",
 	"stream-view.settings.voice-video-width.name": "Voice/Video Size (pixels)",
 	"stream-view.settings.voice-video-width.hint": "Size (width or height depending on orientation) in pixels for voice/video bar on Stream View.",
 	"stream-view.settings.voice-video-position.name": "Voice/Video Position",

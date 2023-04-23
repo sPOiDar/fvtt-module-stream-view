@@ -328,6 +328,16 @@ class StreamView {
 			type: Boolean,
 		});
 
+		game.settings.register('stream-view', 'hide-voice-video-stream-user', {
+			name: game.i18n.localize('stream-view.settings.voice-video-hide-stream-user.name'),
+			hint: game.i18n.localize('stream-view.settings.voice-video-hide-stream-user.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: true,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'voice-video-position', {
 			name: game.i18n.localize('stream-view.settings.voice-video-position.name'),
 			hint: game.i18n.localize('stream-view.settings.voice-video-position.hint'),
@@ -582,11 +592,13 @@ class StreamView {
 			}
 		}
 
-		const streamCamera = html.find(
-			`div[data-user="${game.settings.get('stream-view', 'user-id')}"]`,
-		);
-		if (streamCamera) {
-			streamCamera.hide();
+		if (game.settings.get('stream-view', 'voice-video-hide-stream-user')) {
+			const streamCamera = html.find(
+				`div[data-user="${game.settings.get('stream-view', 'user-id')}"]`,
+			);
+			if (streamCamera) {
+				streamCamera.hide();
+			}
 		}
 	}
 
