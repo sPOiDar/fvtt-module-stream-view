@@ -90,6 +90,18 @@ class StreamView {
 			type: Boolean,
 		});
 
+		game.settings.register('stream-view', 'disable-manually-tracked-tokens', {
+			name: game.i18n.localize('stream-view.settings.disable-manually-tracked-tokens.name'),
+			hint: game.i18n.localize('stream-view.settings.disable-manually-tracked-tokens.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			requiresReload: true,
+			default: false,
+			onChange: (enabled) => { if (enabled) instance._clearTrackedTokens() },
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'directed-combat', {
 			name: game.i18n.localize('stream-view.settings.directed-combat.name'),
 			hint: game.i18n.localize('stream-view.settings.directed-combat.hint'),
@@ -514,20 +526,6 @@ class StreamView {
 			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 		});
 
-		game.keybindings.register('stream-view', 'token-tracked-enable', {
-			name: game.i18n.localize('stream-view.controls.token-tracked-enable'),
-			onDown: () => instance._toggleControlledTokenTracking(true),
-			restricted: true,
-			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
-		});
-
-		game.keybindings.register('stream-view', 'token-tracked-clear', {
-			name: game.i18n.localize('stream-view.controls.token-tracked-clear'),
-			onDown: () => instance._clearTrackedTokens(),
-			restricted: true,
-			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
-		});
-
 		game.keybindings.register('stream-view', 'toggle-notes-layer', {
 			name: game.i18n.localize('CONTROLS.NoteToggle'),
 			onDown: () => instance._sendToggleNotes(!this._notesStatus),
@@ -541,6 +539,22 @@ class StreamView {
 			restricted: true,
 			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 		});
+
+		if (!game.settings.get('stream-view', 'disable-manually-tracked-tokens')) {
+			game.keybindings.register('stream-view', 'token-tracked-enable', {
+				name: game.i18n.localize('stream-view.controls.token-tracked-enable'),
+				onDown: () => instance._toggleControlledTokenTracking(true),
+				restricted: true,
+				precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+			});
+
+			game.keybindings.register('stream-view', 'token-tracked-clear', {
+				name: game.i18n.localize('stream-view.controls.token-tracked-clear'),
+				onDown: () => instance._clearTrackedTokens(),
+				restricted: true,
+				precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
+			});
+		}
 	}
 
 	static get isStreamUser() {
@@ -1006,7 +1020,7 @@ class StreamView {
 	}
 
 	_addStreamControls(controls) {
-		controls.push({
+		const control = {
 			name: 'stream-view',
 			title: 'Stream View',
 			icon: 'fas fa-broadcast-tower',
@@ -1035,14 +1049,17 @@ class StreamView {
 					icon: 'far fa-window-restore',
 					onClick: () => this._sendClosePopouts(),
 				},
-				{
-					name: 'token-tracked-clear',
-					title: 'stream-view.controls.token-tracked-clear',
-					icon: 'fas fa-video-slash',
-					onClick: () => this._clearTrackedTokens(),
-				},
 			],
-		});
+		};
+		if (!game.settings.get('stream-view', 'disable-manually-tracked-tokens')) {
+			control.tools.push({
+				name: 'token-tracked-clear',
+				title: 'stream-view.controls.token-tracked-clear',
+				icon: 'fas fa-video-slash',
+				onClick: () => this._clearTrackedTokens(),
+			});
+		}
+		controls.push(control);
 	}
 
 	async _sendClosePopouts() {
@@ -1249,7 +1266,7 @@ class StreamView {
 	}
 
 	_handleTokenHUD(html, tokenHUD) {
-		if (!game.user?.isGM) {
+		if (game.settings.get('stream-view', 'disable-manually-tracked-tokens') || !game.user?.isGM) {
 			return;
 		}
 

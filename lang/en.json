@@ -27,6 +27,8 @@
 	"stream-view.settings.disable-combatant-tracking.hint": "If set, disables automatic camera tracking of the current combatant during combat.",
 	"stream-view.settings.ignore-invisible-players.name": "Ignore Invisible Players",
 	"stream-view.settings.ignore-invisible-players.hint": "If set, will ignore invisible PCs when deciding the camera bounds.",
+	"stream-view.settings.disable-manually-tracked-tokens.name": "Disable Manual Token Tracking",
+	"stream-view.settings.disable-manually-tracked-tokens.hint": "If set, disables the feature allowing manual tracking of tokens by using the token HUD.",
 	"stream-view.settings.directed-combat.name": "Directed Combat",
 	"stream-view.settings.directed-combat.hint": "If enabled, during combat the Stream View camera will follow the view of the current combatant.",
 	"stream-view.settings.show-speech-bubbles.name": "Show Speech Bubbles",
