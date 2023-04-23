@@ -1,3 +1,14 @@
+## [1.3.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.3.0...v1.3.1) (2023-04-23)
+
+
+### Bug Fixes
+
+* **build:** Commit correct SHA to tags ([f1a5ec3](https://github.com/sPOiDar/fvtt-module-stream-view/commit/f1a5ec3))
+* **compatibility:** Bump core compat to v11 ([4892b71](https://github.com/sPOiDar/fvtt-module-stream-view/commit/4892b71))
+
+
+
+
 # [1.3.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.2.2...v1.3.0) (2022-10-03)
 
 
