@@ -1490,14 +1490,16 @@ class StreamView {
 
 		libWrapper.register(
 			'stream-view',
-			'ChatLog.prototype._renderInner',
-			async (wrapped, ...args) => {
-				let html = await wrapped(...args);
+			'ChatLog.defaultOptions',
+			(wrapped) => {
+				let ret = wrapped();
 				let maxHeight = game.settings.get('stream-view', 'chat-max-height');
 				if (maxHeight > 0) {
-					html.css('max-height', `${maxHeight}px`);
+					ret = foundry.utils.mergeObject(ret, {
+						height: maxHeight
+					});
 				}
-				return html;
+				return ret;
 			},
 			'WRAPPER',
 		);
