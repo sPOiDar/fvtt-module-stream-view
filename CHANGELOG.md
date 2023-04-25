@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.3.1...v1.4.0) (2023-04-25)
+
+
+### Features
+
+* **camera:** Allow ignoring invisible player tokens ([#53](https://github.com/sPOiDar/fvtt-module-stream-view/issues/53)) ([8717224](https://github.com/sPOiDar/fvtt-module-stream-view/commit/8717224)), closes [#38](https://github.com/sPOiDar/fvtt-module-stream-view/issues/38)
+* **chat:** Allow setting max height for chat popout ([cae7c28](https://github.com/sPOiDar/fvtt-module-stream-view/commit/cae7c28)), closes [#33](https://github.com/sPOiDar/fvtt-module-stream-view/issues/33)
+* **ui:** Allow disabling the manual token tracking feature ([2adb49a](https://github.com/sPOiDar/fvtt-module-stream-view/commit/2adb49a)), closes [#40](https://github.com/sPOiDar/fvtt-module-stream-view/issues/40)
+* **voice/video:** Allow toggling the Stream user in voice/video output ([1b2d66e](https://github.com/sPOiDar/fvtt-module-stream-view/commit/1b2d66e)), closes [#45](https://github.com/sPOiDar/fvtt-module-stream-view/issues/45)
+
+
+
+
 ## [1.3.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.3.0...v1.3.1) (2023-04-23)
 
 
