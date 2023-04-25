@@ -176,6 +176,16 @@ class StreamView {
 			type: Boolean,
 		});
 
+		game.settings.register('stream-view', 'ignore-invisible-players', {
+			name: game.i18n.localize('stream-view.settings.ignore-invisible-players.name'),
+			hint: game.i18n.localize('stream-view.settings.ignore-invisible-players.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'speaker-decay', {
 			name: game.i18n.localize('stream-view.settings.speaker-decay.name'),
 			hint: game.i18n.localize('stream-view.settings.speaker-decay.hint'),
@@ -1674,6 +1684,9 @@ class StreamView {
 		}
 		if (tokens.length === 0) {
 			tokens = this._playerTokens();
+		}
+		if (game.settings.get('stream-view', 'ignore-invisible-players')) {
+			tokens = tokens.filter((t) => t.visible);
 		}
 		this.animateTo(this._coordBounds(this._tokenCoords(tokens)));
 	}
