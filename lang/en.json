@@ -45,6 +45,8 @@
 	"stream-view.settings.chat-position-x.hint": "Horizontal screen position for chat log (negative numbers position from right of screen).",
 	"stream-view.settings.chat-position-y.name": "Chat Position Y (pixels)",
 	"stream-view.settings.chat-position-y.hint": "Vertical screen position for chat log (negative numbers position from bottom of screen).",
+	"stream-view.settings.chat-max-height.name": "Chat Maxiumum Height (pixels)",
+	"stream-view.settings.chat-max-height.hint": "Maximum height for the chat log (zero or negative for default size).",
 	"stream-view.settings.auto-show-combat.name": "Auto Show Combat Tracker",
 	"stream-view.settings.auto-show-combat.hint": "Show/hide combat tracker when combat starts/ends.",
 	"stream-view.settings.combat-position-x.name": "Combat Tracker Position X (pixels)",

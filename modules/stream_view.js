@@ -238,6 +238,16 @@ class StreamView {
 			type: Number,
 		});
 
+		game.settings.register('stream-view', 'chat-max-height', {
+			name: game.i18n.localize('stream-view.settings.chat-max-height.name'),
+			hint: game.i18n.localize('stream-view.settings.chat-max-height.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 0,
+			type: Number,
+		});
+
 		game.settings.register('stream-view', 'auto-show-combat', {
 			name: game.i18n.localize('stream-view.settings.auto-show-combat.name'),
 			hint: game.i18n.localize('stream-view.settings.auto-show-combat.hint'),
@@ -1308,7 +1318,13 @@ class StreamView {
 			// Extract chat log body.
 			html.find('#chat-controls').remove();
 			html.find('#chat-form').remove();
+			html.find('#chat-log').css('height', '100%');
 			StreamView.hidePopoutHeaders(html);
+			const maxHeight = game.settings.get('stream-view', 'chat-max-height');
+			if (maxHeight > 0) {
+				html.css('max-height', `${maxHeight}px`);
+				html.css('min-height', 0);
+			}
 			return;
 		} else if (app instanceof CombatTracker) {
 			StreamView.hidePopoutHeaders(html);
