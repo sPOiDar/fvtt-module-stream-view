@@ -48,6 +48,10 @@ class StreamView {
 	}
 
 	static init(instance) {
+		const mod = game.modules.get('stream-view');
+		mod.instance = instance;
+		mod.options = StreamViewOptions;
+
 		CONFIG.Canvas.layers.streamView = {
 			layerClass: StreamViewLayer,
 			group: "interface",
@@ -1055,7 +1059,7 @@ class StreamView {
 					icon: 'fas fa-video',
 					toggle: true,
 					active: this._cameraMode === StreamViewOptions.CameraMode.DIRECTED,
-					onClick: () => this._toggleCameraMode(),
+					onClick: () => this.toggleCameraMode(),
 				},
 				{
 					name: "toggle",
@@ -1069,7 +1073,7 @@ class StreamView {
 					name: 'close-popouts',
 					title: 'stream-view.controls.close-popouts',
 					icon: 'far fa-window-restore',
-					onClick: () => this._sendClosePopouts(),
+					onClick: () => this.closePopouts(),
 				},
 			],
 		};
@@ -1078,13 +1082,13 @@ class StreamView {
 				name: 'token-tracked-clear',
 				title: 'stream-view.controls.token-tracked-clear',
 				icon: 'fas fa-video-slash',
-				onClick: () => this._clearTrackedTokens(),
+				onClick: () => this.clearTrackedTokens(),
 			});
 		}
 		controls.push(control);
 	}
 
-	async _sendClosePopouts() {
+	async closePopouts() {
 		if (!game.user.isGM) {
 			return;
 		}
@@ -1137,7 +1141,7 @@ class StreamView {
 		return this._getNotesStatus()
 	}
 
-	async _toggleCameraMode() {
+	async toggleCameraMode() {
 		if (!game.user.isGM) {
 			return;
 		}
@@ -1149,11 +1153,11 @@ class StreamView {
 		if (this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC) {
 			targetMode = StreamViewOptions.CameraMode.DIRECTED;
 		}
-		this._setCameraMode(targetMode);
+		this.setCameraMode(targetMode);
 
 	}
 
-	async _setCameraMode(mode) {
+	async setCameraMode(mode) {
 		this._cameraMode = mode;
 
 		if (StreamView.isStreamUser) {
@@ -1200,11 +1204,12 @@ class StreamView {
 		canvas.streamView.drawPreview({ x, y, width, height });
 	}
 
-	_clearTrackedTokens() {
+	clearTrackedTokens() {
 		this._trackedTokens[this._sceneId].forEach((t) => {
 			const token = game.canvas.tokens.get(t);
 			this._toggleTokenTracking(token, false);
 		});
+		ui.notifications.info('Stream View tracked tokens cleared');
 	}
 
 	_handleDrawToken(token) {
@@ -1445,7 +1450,7 @@ class StreamView {
 		socket.register('connected', this._socketConnected.bind(this));
 		socket.register('controlledToken', this._controlledToken.bind(this));
 		socket.register('animateTo', this._debounceAnimateTo.bind(this));
-		socket.register('setCameraMode', this._setCameraMode.bind(this));
+		socket.register('setCameraMode', this.setCameraMode.bind(this));
 		socket.register('closePopouts', this._closePopouts.bind(this));
 		socket.register('previewCamera', this._previewCamera.bind(this));
 		socket.register('toggleNotes', this._toggleNotes.bind(this));
