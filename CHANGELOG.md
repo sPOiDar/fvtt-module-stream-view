@@ -1,3 +1,18 @@
+# [1.5.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.4.0...v1.5.0) (2023-04-28)
+
+
+### Bug Fixes
+
+* **translations:** Add espanol ([#55](https://github.com/sPOiDar/fvtt-module-stream-view/issues/55)) ([82bb802](https://github.com/sPOiDar/fvtt-module-stream-view/commit/82bb802))
+
+
+### Features
+
+* **macros:** Add macros for various tasks for quick access ([012bf16](https://github.com/sPOiDar/fvtt-module-stream-view/commit/012bf16)), closes [#37](https://github.com/sPOiDar/fvtt-module-stream-view/issues/37)
+
+
+
+
 # [1.4.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.3.1...v1.4.0) (2023-04-25)
 
 
