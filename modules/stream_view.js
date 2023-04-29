@@ -1081,7 +1081,7 @@ class StreamView {
 			control.tools.push({
 				name: 'token-tracked-clear',
 				title: 'stream-view.controls.token-tracked-clear',
-				icon: 'fas fa-video-slash',
+				icon: 'fas fa-users-slash',
 				onClick: () => this.clearTrackedTokens(),
 			});
 		}

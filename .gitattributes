@@ -1,1 +1,1 @@
-packs/*.db -diff
+packs/**/* -diff
