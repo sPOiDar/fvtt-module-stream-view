@@ -1,3 +1,13 @@
+## [1.5.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.5.0...v1.5.1) (2023-04-29)
+
+
+### Bug Fixes
+
+* **translations:** Add es to the module language list ([986f180](https://github.com/sPOiDar/fvtt-module-stream-view/commit/986f180))
+
+
+
+
 # [1.5.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.4.0...v1.5.0) (2023-04-28)
 
 
