@@ -1,3 +1,19 @@
+# [1.6.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.5.1...v1.6.0) (2023-04-29)
+
+
+### Bug Fixes
+
+* **core:** Fix method names missed by VSCode rename ([d35089a](https://github.com/sPOiDar/fvtt-module-stream-view/commit/d35089a))
+* **ui:** Update clear tracked tokens icon ([392082b](https://github.com/sPOiDar/fvtt-module-stream-view/commit/392082b))
+
+
+### Features
+
+* **core:** Add "Disabled" camera mode, to support table play ([e725bdd](https://github.com/sPOiDar/fvtt-module-stream-view/commit/e725bdd)), closes [#32](https://github.com/sPOiDar/fvtt-module-stream-view/issues/32) [#49](https://github.com/sPOiDar/fvtt-module-stream-view/issues/49)
+
+
+
+
 ## [1.5.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.5.0...v1.5.1) (2023-04-29)
 
 
