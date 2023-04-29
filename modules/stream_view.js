@@ -80,7 +80,7 @@ class StreamView {
 				[StreamViewOptions.CameraMode.DIRECTED]: StreamViewOptions.localizeCameraMode(StreamViewOptions.CameraMode.DIRECTED),
 			},
 			default: StreamViewOptions.CameraMode.AUTOMATIC,
-			onChange: (mode) => instance._setCameraMode(mode),
+			onChange: (mode) => instance.setCameraMode(mode),
 			type: String,
 		});
 
@@ -102,7 +102,7 @@ class StreamView {
 			restricted: true,
 			requiresReload: true,
 			default: false,
-			onChange: (enabled) => { if (enabled) instance._clearTrackedTokens() },
+			onChange: (enabled) => { if (enabled) instance.clearTrackedTokens() },
 			type: Boolean,
 		});
 
@@ -545,7 +545,7 @@ class StreamView {
 		// Keybinds
 		game.keybindings.register('stream-view', 'camera-mode-toggle', {
 			name: game.i18n.localize('stream-view.controls.toggle-camera-mode'),
-			onDown: () => instance._toggleCameraMode(),
+			onDown: () => instance.toggleCameraMode(),
 			restricted: true,
 			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 		});
@@ -559,7 +559,7 @@ class StreamView {
 
 		game.keybindings.register('stream-view', 'close-popouts', {
 			name: game.i18n.localize('stream-view.controls.close-popouts'),
-			onDown: () => instance._sendClosePopouts(),
+			onDown: () => instance.closePopouts(),
 			restricted: true,
 			precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 		});
@@ -574,7 +574,7 @@ class StreamView {
 
 			game.keybindings.register('stream-view', 'token-tracked-clear', {
 				name: game.i18n.localize('stream-view.controls.token-tracked-clear'),
-				onDown: () => instance._clearTrackedTokens(),
+				onDown: () => instance.clearTrackedTokens(),
 				restricted: true,
 				precedence: CONST.KEYBINDING_PRECEDENCE.NORMAL,
 			});
