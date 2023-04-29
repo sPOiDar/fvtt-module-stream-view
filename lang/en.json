@@ -1,5 +1,6 @@
 {
 	"stream-view.controls.toggle-camera-mode": "Toggle Camera Mode",
+	"stream-view.controls.toggle-camera-disabled": "Toggle Camera Disabled",
 	"stream-view.controls.toggle-foreground-layer": "Toggle Foreground Layer",
 	"stream-view.controls.close-popouts": "Close Popouts",
 	"stream-view.controls.token-track-toggle": "Track on Stream",
@@ -12,6 +13,9 @@
 	"stream-view.settings.camera-mode.hint": "'Automatic' camera mode will track the party, focusing on speaking tokens (in-game voice or text), and track the current combatant/targets during combat. 'Directed' mode tracks the view of the GM on the Stream View.",
 	"stream-view.settings.camera-mode.option.automatic": "Automatic",
 	"stream-view.settings.camera-mode.option.directed": "Directed",
+	"stream-view.settings.camera-mode.option.disabled": "Disabled",
+	"stream-view.settings.disabled-camera-initial-view.name": "Initial View on Camera Disabled",
+	"stream-view.settings.disabled-camera-initial-view.hint": "When the camera mode is set to Disabled, reset the Stream View to the initial view defined by the scene.",
 	"stream-view.settings.maximum-scale.name": "Maximum Scale",
 	"stream-view.settings.maximum-scale.hint": "Maximum scale when zooming in Automatic camera mode.",
 	"stream-view.settings.minimum-scale.name": "Minimum Scale",

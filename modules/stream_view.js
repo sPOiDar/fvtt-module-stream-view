@@ -78,10 +78,21 @@ class StreamView {
 			choices: {
 				[StreamViewOptions.CameraMode.AUTOMATIC]: StreamViewOptions.localizeCameraMode(StreamViewOptions.CameraMode.AUTOMATIC),
 				[StreamViewOptions.CameraMode.DIRECTED]: StreamViewOptions.localizeCameraMode(StreamViewOptions.CameraMode.DIRECTED),
+				[StreamViewOptions.CameraMode.DISABLED]: StreamViewOptions.localizeCameraMode(StreamViewOptions.CameraMode.DISABLED),
 			},
 			default: StreamViewOptions.CameraMode.AUTOMATIC,
 			onChange: (mode) => instance.setCameraMode(mode),
 			type: String,
+		});
+
+		game.settings.register('stream-view', 'disabled-camera-initial-view', {
+			name: game.i18n.localize('stream-view.settings.disabled-camera-initial-view.name'),
+			hint: game.i18n.localize('stream-view.settings.disabled-camera-initial-view.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: true,
+			type: Boolean,
 		});
 
 		game.settings.register('stream-view', 'disable-combatant-tracking', {
@@ -669,6 +680,7 @@ class StreamView {
 		this._speechBubbles = new SpeechBubbles();
 		this._socket = undefined;
 		this._cameraMode = StreamViewOptions.CameraMode.AUTOMATIC;
+		this._cameraModeLast = StreamViewOptions.CameraMode.AUTOMATIC;
 		this._speakerHistory = new Map();
 		this._popouts = new Map();
 		this._controlledTokenId = null;
@@ -757,17 +769,24 @@ class StreamView {
 		return false;
 	}
 
-	get _isAutoCamera() {
+	get _isCameraAutomatic() {
 		return (
 			this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC &&
 			!(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
 
-	get _isDirectedCamera() {
+	get _isCameraDirected() {
 		return (
 			this._cameraMode === StreamViewOptions.CameraMode.DIRECTED ||
 			(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
+		);
+	}
+
+	get _isCameraDisabled() {
+		return (
+			this._cameraMode === StreamViewOptions.CameraMode.DISABLED &&
+			!(this._combatActive && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
 
@@ -775,7 +794,7 @@ class StreamView {
 		if (StreamView.isStreamUser) {
 			return;
 		}
-		if (!this._isDirectedCamera || !game.canvas.scene?.active) {
+		if (!this._isCameraDirected || !game.canvas.scene?.active) {
 			return;
 		}
 		if (this._combatActive && game.settings.get('stream-view', 'directed-combat')) {
@@ -788,7 +807,7 @@ class StreamView {
 	}
 
 	async _sendDirectedPan(view) {
-		if (!this._isDirectedCamera) {
+		if (!this._isCameraDirected) {
 			return;
 		}
 		if (!this._socket) {
@@ -1062,6 +1081,14 @@ class StreamView {
 					onClick: () => this.toggleCameraMode(),
 				},
 				{
+					name: 'camera-disable',
+					title: 'stream-view.controls.toggle-camera-disabled',
+					icon: 'fas fa-video-slash',
+					toggle: true,
+					active: this._cameraMode === StreamViewOptions.CameraMode.DISABLED,
+					onClick: () => this.toggleCameraDisabled(),
+				},
+				{
 					name: "toggle",
 					title: "CONTROLS.NoteToggle",
 					icon: "fas fa-map-pin",
@@ -1150,22 +1177,56 @@ class StreamView {
 		}
 
 		let targetMode = StreamViewOptions.CameraMode.AUTOMATIC;
-		if (this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC) {
+		if (this._isCameraAutomatic) {
 			targetMode = StreamViewOptions.CameraMode.DIRECTED;
 		}
-		this.setCameraMode(targetMode);
+		await this.setCameraMode(targetMode);
+	}
 
+	async toggleCameraDisabled() {
+		if (!game.user.isGM) {
+			return;
+		}
+		if (!this._socket) {
+			return;
+		}
+
+		let targetMode = StreamViewOptions.CameraMode.DISABLED;
+		if (this._isCameraDisabled) {
+			targetMode = this._cameraModeLast;
+		} else {
+			// Store last camera mode fore restore
+			this._cameraModeLast = this._cameraMode;
+		}
+		await this.setCameraMode(targetMode);
 	}
 
 	async setCameraMode(mode) {
+		if (!game.user.isGM && !StreamView.isStreamUser) {
+			return;
+		}
+
 		this._cameraMode = mode;
 
 		if (StreamView.isStreamUser) {
-			this.focusUpdate();
+			if (this._isCameraDisabled && game.settings.get('stream-view', 'disabled-camera-initial-view')) {
+				this.animateTo(this._getInitialViewport())
+			} else {
+				this.focusUpdate();
+			}
 			return;
 		}
 
 		await this._setGMCameraMode(mode);
+	}
+
+	_getInitialViewport() {
+		let {x, y, scale} = game.scenes.get(this._sceneId).initial;
+		const r = game.canvas.dimensions.rect;
+		x ??= (r.right / 2);
+		y ??= (r.bottom / 2);
+		scale ??= Math.clamped(Math.min(window.innerHeight / r.height, window.innerWidth / r.width), 0.25, 3);
+		return {x, y, scale};
 	}
 
 	async _setGMCameraMode(mode) {
@@ -1680,7 +1741,7 @@ class StreamView {
 	updateCombat(active, combat) {
 		this._combatActive = !!active;
 
-		if (active && this._isDirectedCamera && !StreamView.isStreamUser) {
+		if (active && this._isCameraDirected && !StreamView.isStreamUser) {
 			this._directedPan({
 				x: canvas.stage.pivot.x,
 				y: canvas.stage.pivot.y,
@@ -1705,7 +1766,7 @@ class StreamView {
 	}
 
 	focusUpdate() {
-		if (!StreamView.isStreamUser || !this._isAutoCamera) {
+		if (!StreamView.isStreamUser || !this._isCameraAutomatic) {
 			return;
 		}
 
@@ -1717,7 +1778,7 @@ class StreamView {
 	}
 
 	focusPlayers() {
-		if (!StreamView.isStreamUser || !this._isAutoCamera) {
+		if (!StreamView.isStreamUser || !this._isCameraAutomatic) {
 			return;
 		}
 
@@ -1742,7 +1803,7 @@ class StreamView {
 	}
 
 	focusCombat(combat) {
-		if (!StreamView.isStreamUser || !this._isAutoCamera) {
+		if (!StreamView.isStreamUser || !this._isCameraAutomatic) {
 			return;
 		}
 

@@ -2,6 +2,7 @@ export class StreamViewOptions {
 	static CameraMode = {
 		AUTOMATIC: 'automatic',
 		DIRECTED: 'directed',
+		DISABLED: 'disabled',
 	};
 	static PreviewDisplay = {
 		NEVER: 'never',
