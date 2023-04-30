@@ -1,3 +1,13 @@
+## [1.6.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.1...v1.6.2) (2023-04-30)
+
+
+### Bug Fixes
+
+* **core:** Allow Directed camera to function on viewed scene, not active ([2b280a6](https://github.com/sPOiDar/fvtt-module-stream-view/commit/2b280a6)), closes [#42](https://github.com/sPOiDar/fvtt-module-stream-view/issues/42)
+
+
+
+
 ## [1.6.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.0...v1.6.1) (2023-04-30)
 
 
