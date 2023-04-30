@@ -597,6 +597,10 @@ class StreamView {
 		return game?.user?.id === game.settings.get('stream-view', 'user-id');
 	}
 
+	static get streamUser() {
+		return game.users.get(game.settings.get('stream-view', 'user-id'));
+	}
+
 	static appendSpeechBubblesContainer(html) {
 		html.append(`<div id="${SpeechBubbles.containerId}"/>`);
 	}
@@ -795,7 +799,7 @@ class StreamView {
 		if (StreamView.isStreamUser) {
 			return;
 		}
-		if (!this._isCameraDirected || !game.canvas.scene?.active) {
+		if (!this._isCameraDirected || StreamView.streamUser?.viewedScene !== this._sceneId) {
 			return;
 		}
 		if (this._combatActive && game.settings.get('stream-view', 'directed-combat')) {
@@ -1003,7 +1007,7 @@ class StreamView {
 			token = await this._tokenForGM(userId);
 		} else {
 			token = game.canvas.tokens.placeables.find(
-				(t) => t.actor?.hasPlayerOwner && user.character && t.actor.id == user.character.id,
+				(t) => t.actor?.hasPlayerOwner && user.character && t.actor.id === user.character.id,
 			);
 		}
 		this._bubblesUpdate(token, isSpeaking);
@@ -1508,7 +1512,7 @@ class StreamView {
 	}
 
 	_socketConnected(userId) {
-		if (userId == game.settings.get('stream-view', 'user-id')) {
+		if (userId === game.settings.get('stream-view', 'user-id')) {
 			this._sendGetNotesStatus();
 		}
 	}
@@ -1719,7 +1723,7 @@ class StreamView {
 	}
 
 	updateScene() {
-		if (!game.canvas.scene || (!StreamView.isStreamUser && !game.user.isGM)) {
+		if (!game.canvas.scene) {
 			return;
 		}
 
@@ -1728,6 +1732,10 @@ class StreamView {
 		}
 
 		this._sceneId = game.canvas.scene.id;
+
+		if (!StreamView.isStreamUser && !game.user.isGM) {
+			return;
+		}
 		if (!this._trackedTokens[this._sceneId]) {
 			this._trackedTokens[this._sceneId] = new Set();
 		}
