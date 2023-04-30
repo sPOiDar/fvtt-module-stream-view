@@ -1,3 +1,13 @@
+## [1.6.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.0...v1.6.1) (2023-04-30)
+
+
+### Bug Fixes
+
+* **core:** Update stream focus when new token is added to current scene ([1912600](https://github.com/sPOiDar/fvtt-module-stream-view/commit/1912600))
+
+
+
+
 # [1.6.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.5.1...v1.6.0) (2023-04-29)
 
 
