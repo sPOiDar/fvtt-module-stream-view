@@ -1,3 +1,13 @@
+## [1.6.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.2...v1.6.3) (2023-05-05)
+
+
+### Bug Fixes
+
+* **settings:** Fix name of voice-video-hide-stream-user in register call ([09c8e36](https://github.com/sPOiDar/fvtt-module-stream-view/commit/09c8e36)), closes [#56](https://github.com/sPOiDar/fvtt-module-stream-view/issues/56)
+
+
+
+
 ## [1.6.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.1...v1.6.2) (2023-04-30)
 
 
