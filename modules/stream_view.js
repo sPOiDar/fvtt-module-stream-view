@@ -354,7 +354,7 @@ class StreamView {
 			type: Boolean,
 		});
 
-		game.settings.register('stream-view', 'hide-voice-video-stream-user', {
+		game.settings.register('stream-view', 'voice-video-hide-stream-user', {
 			name: game.i18n.localize('stream-view.settings.voice-video-hide-stream-user.name'),
 			hint: game.i18n.localize('stream-view.settings.voice-video-hide-stream-user.hint'),
 			scope: 'world',
