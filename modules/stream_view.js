@@ -128,6 +128,16 @@ class StreamView {
 			type: Boolean,
 		});
 
+		game.settings.register('stream-view', 'select-combatant', {
+			name: game.i18n.localize('stream-view.settings.select-combatant.name'),
+			hint: game.i18n.localize('stream-view.settings.select-combatant.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'maximum-scale', {
 			name: game.i18n.localize('stream-view.settings.maximum-scale.name'),
 			hint: game.i18n.localize('stream-view.settings.maximum-scale.hint'),
@@ -886,7 +896,7 @@ class StreamView {
 		return targets;
 	}
 
-	_combatTokens(combat) {
+	_visibleCombatTokens(combat) {
 		const combatant = combat?.combatant;
 		if (!combatant) {
 			return [];
@@ -1226,12 +1236,12 @@ class StreamView {
 	}
 
 	_getInitialViewport() {
-		let {x, y, scale} = game.scenes.get(this._sceneId).initial;
+		let { x, y, scale } = game.scenes.get(this._sceneId).initial;
 		const r = game.canvas.dimensions.rect;
 		x ??= (r.right / 2);
 		y ??= (r.bottom / 2);
 		scale ??= Math.clamped(Math.min(window.innerHeight / r.height, window.innerWidth / r.width), 0.25, 3);
-		return {x, y, scale};
+		return { x, y, scale };
 	}
 
 	async _setGMCameraMode(mode) {
@@ -1667,7 +1677,8 @@ class StreamView {
 		if (game.settings.get('stream-view', 'show-chat') && !game.settings.get('stream-view', 'show-full-sidebar')) {
 			this.createPopout(StreamViewOptions.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
 		}
-		this.focusCombat(game.combat);
+
+		this.focusUpdate();
 	}
 
 	createPopout(identifier, app) {
@@ -1816,12 +1827,39 @@ class StreamView {
 		this.animateTo(this._coordBounds(this._tokenCoords(tokens)));
 	}
 
-	focusCombat(combat) {
-		if (!StreamView.isStreamUser || !this._isCameraAutomatic) {
+	async _combatTokens(combat) {
+		const p = new Promise((resolve) => {
+			let released = 0;
+			if (game.settings.get('stream-view', 'select-combatant')) {
+				released = game.canvas.tokens.releaseAll();
+			}
+			if (released === 0) {
+				resolve(this._visibleCombatTokens(combat));
+			} else {
+				Hooks.once("sightRefresh", () => {
+					resolve(this._visibleCombatTokens(combat));
+				});
+			}
+		});
+
+		return p;
+	}
+
+	async focusCombat(combat) {
+		if (!StreamView.isStreamUser) {
 			return;
 		}
 
-		const tokens = this._combatTokens(combat);
+		const tokens = await this._combatTokens(combat);
+
+		if (game.settings.get('stream-view', 'select-combatant')) {
+			tokens.forEach(tkn => tkn.control({ releaseOthers: false }))
+		}
+
+		if (!this._isCameraAutomatic) {
+			return;
+		}
+
 		if (game.settings.get('stream-view', 'disable-combatant-tracking') || tokens.length === 0) {
 			this.focusPlayers();
 			return;
