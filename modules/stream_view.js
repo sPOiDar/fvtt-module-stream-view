@@ -274,6 +274,16 @@ class StreamView {
 			type: Number,
 		});
 
+		game.settings.register('stream-view', 'chat-max-height-combat', {
+			name: game.i18n.localize('stream-view.settings.chat-max-height-combat.name'),
+			hint: game.i18n.localize('stream-view.settings.chat-max-height-combat.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 0,
+			type: Number,
+		});
+
 		game.settings.register('stream-view', 'auto-show-combat', {
 			name: game.i18n.localize('stream-view.settings.auto-show-combat.name'),
 			hint: game.i18n.localize('stream-view.settings.auto-show-combat.hint'),
@@ -301,6 +311,16 @@ class StreamView {
 			config: true,
 			restricted: true,
 			default: 40,
+			type: Number,
+		});
+
+		game.settings.register('stream-view', 'combat-max-height', {
+			name: game.i18n.localize('stream-view.settings.combat-max-height.name'),
+			hint: game.i18n.localize('stream-view.settings.combat-max-height.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: 0,
 			type: Number,
 		});
 
@@ -1406,7 +1426,10 @@ class StreamView {
 			html.find('#chat-form').remove();
 			html.find('#chat-log').css('height', '100%');
 			StreamView.hidePopoutHeaders(html);
-			const maxHeight = game.settings.get('stream-view', 'chat-max-height');
+			let maxHeight = game.settings.get('stream-view', 'chat-max-height');
+			if (this._combatActive) {
+				maxHeight = game.settings.get('stream-view', 'chat-max-height-combat');
+			}
 			if (maxHeight > 0) {
 				html.css('max-height', `${maxHeight}px`);
 				html.css('min-height', 0);
@@ -1414,6 +1437,11 @@ class StreamView {
 			return;
 		} else if (app instanceof CombatTracker) {
 			StreamView.hidePopoutHeaders(html);
+			const maxHeight = game.settings.get('stream-view', 'combat-max-height');
+			if (maxHeight > 0) {
+				html.css('max-height', `${maxHeight}px`);
+				html.css('min-height', 0);
+			}
 			return;
 		} else if (app instanceof UserConfig) {
 			// Auto-close UserConfig immediately (we don't use it as the stream user).
@@ -1679,6 +1707,7 @@ class StreamView {
 		}
 
 		this.focusUpdate();
+		this.updateCombat(game.combat.active, game.combat);
 	}
 
 	createPopout(identifier, app) {
@@ -1776,6 +1805,31 @@ class StreamView {
 		}
 		if (!StreamView.isStreamUser) {
 			return;
+		}
+
+		if (this._combatActive) {
+			const maxHeight = game.settings.get('stream-view', 'chat-max-height-combat');
+			if (maxHeight > 0) {
+				const chat = this._popouts.get(StreamViewOptions.PopoutIdentifiers.CHAT);
+				if (chat) {
+					chat.element.css('max-height', `${maxHeight}px`);
+					chat.element.css('min-height', 0);
+					chat.scrollBottom();
+				}
+			}
+		} else {
+			const maxHeight = game.settings.get('stream-view', 'chat-max-height');
+			const chat = this._popouts.get(StreamViewOptions.PopoutIdentifiers.CHAT);
+			if (chat) {
+				if (maxHeight > 0) {
+					chat.element.css('max-height', `${maxHeight}px`);
+					chat.element.css('min-height', 0);
+				} else {
+					chat.element.css('max-height', '');
+					chat.element.css('min-height', '');
+				}
+				chat.scrollBottom();
+			}
 		}
 
 		if (game.settings.get('stream-view', 'auto-show-combat')) {
