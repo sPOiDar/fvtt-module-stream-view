@@ -1,3 +1,19 @@
+# [1.7.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.3...v1.7.0) (2023-05-21)
+
+
+### Bug Fixes
+
+* **combat:** Fix potential absent combat on load ([32f6c1b](https://github.com/sPOiDar/fvtt-module-stream-view/commit/32f6c1b))
+
+
+### Features
+
+* **combat:** Add combat tracker max height and chat max height (combat) ([7c1210d](https://github.com/sPOiDar/fvtt-module-stream-view/commit/7c1210d)), closes [#57](https://github.com/sPOiDar/fvtt-module-stream-view/issues/57)
+* **combat:** Allow selecting combatant tokens ([81bc747](https://github.com/sPOiDar/fvtt-module-stream-view/commit/81bc747)), closes [#58](https://github.com/sPOiDar/fvtt-module-stream-view/issues/58) [#59](https://github.com/sPOiDar/fvtt-module-stream-view/issues/59)
+
+
+
+
 ## [1.6.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.2...v1.6.3) (2023-05-05)
 
 
