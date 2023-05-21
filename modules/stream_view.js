@@ -1707,7 +1707,7 @@ class StreamView {
 		}
 
 		this.focusUpdate();
-		this.updateCombat(game.combat.active, game.combat);
+		this.updateCombat(game.combat?.active, game.combat);
 	}
 
 	createPopout(identifier, app) {
