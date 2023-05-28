@@ -1,3 +1,13 @@
+## [1.7.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.0...v1.7.1) (2023-05-28)
+
+
+### Bug Fixes
+
+* **rendering:** Update positioning method for popouts ([100782f](https://github.com/sPOiDar/fvtt-module-stream-view/commit/100782f)), closes [#57](https://github.com/sPOiDar/fvtt-module-stream-view/issues/57)
+
+
+
+
 # [1.7.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.6.3...v1.7.0) (2023-05-21)
 
 
