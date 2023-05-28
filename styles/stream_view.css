@@ -1,3 +1,7 @@
+body.stream-view #combat-popout, body.stream-view #chat-popout {
+	min-height: 0;
+}
+
 .stream-view-speech-bubble {
 	position: absolute;
 	font-size: 32px;

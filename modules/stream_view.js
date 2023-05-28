@@ -677,27 +677,23 @@ class StreamView {
 		html.children('header.window-header').hide();
 	}
 
-	static setPopoutPosition(html) {
+	static setPopoutPosition(app) {
 		if (!game.settings.get('stream-view', 'popout-position-fixed')) {
 			return;
 		}
-		const x = game.settings.get('stream-view', `popout-position-x`);
-		const y = game.settings.get('stream-view', `popout-position-y`);
-		const width = game.settings.get('stream-view', `popout-width`);
-		const height = game.settings.get('stream-view', `popout-height`);
+		const options = {};
+		options.left = game.settings.get('stream-view', `popout-position-x`);
+		options.top = game.settings.get('stream-view', `popout-position-y`);
+		options.width = game.settings.get('stream-view', `popout-width`);
+		options.height = game.settings.get('stream-view', `popout-height`);
 
-		if (y < 0) {
-			html.css('bottom', y * -1);
-		} else {
-			html.css('top', y);
+		if (options.top < 0) {
+			options.top = window.innerHeight + options.top - options.height;
 		}
-		if (x < 0) {
-			html.css('right', x * -1);
-		} else {
-			html.css('left', x);
+		if (options.left < 0) {
+			options.left = window.innerWidth + options.left - options.width
 		}
-		html.css('width', `${width}px`);
-		html.css('height', `${height}px`);
+		app.setPosition(options);
 	}
 
 	static isCombatActive(combat) {
@@ -1426,22 +1422,9 @@ class StreamView {
 			html.find('#chat-form').remove();
 			html.find('#chat-log').css('height', '100%');
 			StreamView.hidePopoutHeaders(html);
-			let maxHeight = game.settings.get('stream-view', 'chat-max-height');
-			if (this._combatActive) {
-				maxHeight = game.settings.get('stream-view', 'chat-max-height-combat');
-			}
-			if (maxHeight > 0) {
-				html.css('max-height', `${maxHeight}px`);
-				html.css('min-height', 0);
-			}
 			return;
 		} else if (app instanceof CombatTracker) {
 			StreamView.hidePopoutHeaders(html);
-			const maxHeight = game.settings.get('stream-view', 'combat-max-height');
-			if (maxHeight > 0) {
-				html.css('max-height', `${maxHeight}px`);
-				html.css('min-height', 0);
-			}
 			return;
 		} else if (app instanceof UserConfig) {
 			// Auto-close UserConfig immediately (we don't use it as the stream user).
@@ -1463,7 +1446,7 @@ class StreamView {
 		}
 
 		StreamView.hidePopoutHeaders(html);
-		StreamView.setPopoutPosition(html);
+		StreamView.setPopoutPosition(app);
 		const autoClose = game.settings.get('stream-view', 'popout-auto-close-duration');
 		this._popouts.set(app.id, app);
 		if (autoClose === 0) {
@@ -1493,7 +1476,7 @@ class StreamView {
 			bottom: 0,
 			left: 0,
 		};
-		const panelSize = 300;
+		const sidebarWidth = SidebarTab.defaultOptions.width;
 
 		const rtcSettings = game.settings.get('core', 'rtcWorldSettings');
 		if (
@@ -1520,21 +1503,29 @@ class StreamView {
 			}
 		}
 
+		const chatpixels = game.settings.get('stream-view', 'chat-position-x');
 		if (game.settings.get('stream-view', 'show-chat')) {
-			let pixels = game.settings.get('stream-view', 'chat-position-x');
-			if (pixels < 0) {
-				padding.right += pixels * -1;
+			if (chatpixels < 0) {
+				padding.right += chatpixels * -1;
 			} else {
-				padding.left += pixels + panelSize;
+				padding.left += chatpixels + sidebarWidth;
 			}
 		}
 
 		if (combat && game.settings.get('stream-view', 'auto-show-combat')) {
-			let pixels = game.settings.get('stream-view', 'combat-position-x');
-			if (pixels < 0) {
-				padding.right += pixels * -1;
+			const combatpixels = game.settings.get('stream-view', 'combat-position-x');
+			if (combatpixels < 0) {
+				if (chatpixels < 0 && combatpixels < chatpixels) {
+					padding.right += (combatpixels - chatpixels) * -1;
+				} else if (chatpixels >= 0) {
+					padding.right += combatpixels * -1;
+				}
 			} else {
-				padding.left += pixels + panelSize;
+				if (chatpixels >= 0 && combatpixels > chatpixels) {
+					padding.left += (combatpixels - chatpixels) + sidebarWidth;
+				} else if (chatpixels < 0) {
+					padding.left += combatpixels + sidebarWidth;
+				}
 			}
 		}
 
@@ -1568,6 +1559,11 @@ class StreamView {
 	}
 
 	ready() {
+		if (StreamView.isStreamUser) {
+			// Scope CSS for StreamView
+			document.body.classList.add('stream-view');
+		}
+
 		if (!game.modules.get('lib-wrapper')?.active) {
 			if (game.user.isGM) {
 				ui.notifications.error(
@@ -1707,7 +1703,29 @@ class StreamView {
 		}
 
 		this.focusUpdate();
-		this.updateCombat(game.combat?.active, game.combat);
+		this.updateCombat(StreamView.isCombatActive(game.combat), game.combat);
+	}
+
+	_popoutOptions(identifier) {
+		if (!StreamView.isStreamUser) {
+			return;
+		}
+
+		const options = {};
+		options.left = game.settings.get('stream-view', `${identifier}-position-x`);
+		options.top = game.settings.get('stream-view', `${identifier}-position-y`);
+		const maxHeight = game.settings.get('stream-view', `${identifier}-max-height`);
+		if (maxHeight > 0) {
+			options.height = maxHeight;
+		}
+		if (options.left < 0) {
+			options.left = window.innerWidth + options.left;
+		}
+		if (options.top < 0) {
+			options.top = window.innerHeight + options.top;
+		}
+
+		return options;
 	}
 
 	createPopout(identifier, app) {
@@ -1719,18 +1737,12 @@ class StreamView {
 		}
 
 		const pop = app.createPopout();
-		let posX = game.settings.get('stream-view', `${identifier}-position-x`);
-		let posY = game.settings.get('stream-view', `${identifier}-position-y`);
-		if (posX < 0) {
-			posX = window.innerWidth + posX;
-		}
-		if (posY < 0) {
-			posY = window.innerHeight + posY;
-		}
-		pop.position.left = posX;
-		pop.position.top = posY;
 		this._popouts.set(identifier, pop);
-		pop.render(true);
+		pop.render(true, this._popoutOptions(identifier));
+		window.addEventListener("resize", () => {
+			const options = this._popoutOptions(identifier);
+			pop.setPosition(options);
+		});
 	}
 
 	async closePopout(identifier) {
@@ -1811,22 +1823,19 @@ class StreamView {
 			const maxHeight = game.settings.get('stream-view', 'chat-max-height-combat');
 			if (maxHeight > 0) {
 				const chat = this._popouts.get(StreamViewOptions.PopoutIdentifiers.CHAT);
-				if (chat) {
-					chat.element.css('max-height', `${maxHeight}px`);
-					chat.element.css('min-height', 0);
+				if (chat && chat.element.length > 0) {
+					chat.setPosition({height: maxHeight});
 					chat.scrollBottom();
 				}
 			}
 		} else {
 			const maxHeight = game.settings.get('stream-view', 'chat-max-height');
 			const chat = this._popouts.get(StreamViewOptions.PopoutIdentifiers.CHAT);
-			if (chat) {
+			if (chat && chat.element.length > 0) {
 				if (maxHeight > 0) {
-					chat.element.css('max-height', `${maxHeight}px`);
-					chat.element.css('min-height', 0);
+					chat.setPosition({height: maxHeight});
 				} else {
-					chat.element.css('max-height', '');
-					chat.element.css('min-height', '');
+					chat.setPosition({height: 'auto'});
 				}
 				chat.scrollBottom();
 			}
