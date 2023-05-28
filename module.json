@@ -33,6 +33,11 @@
       "lang": "es",
       "name": "Spanish",
       "path": "lang/es.json"
+    },
+    {
+      "lang": "pl",
+      "name": "polski",
+      "path": "lang/pl.json"
     }
   ],
   "packs": [
