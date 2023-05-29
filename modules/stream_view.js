@@ -1714,7 +1714,10 @@ class StreamView {
 		const options = {};
 		options.left = game.settings.get('stream-view', `${identifier}-position-x`);
 		options.top = game.settings.get('stream-view', `${identifier}-position-y`);
-		const maxHeight = game.settings.get('stream-view', `${identifier}-max-height`);
+		let maxHeight = game.settings.get('stream-view', `${identifier}-max-height`);
+		if (this._combatActive && game.settings.settings.get(`stream-view.${identifier}-max-height-combat`)) {
+			maxHeight = game.settings.get('stream-view', `${identifier}-max-height-combat`) || maxHeight;
+		}
 		if (maxHeight > 0) {
 			options.height = maxHeight;
 		}
@@ -1824,6 +1827,8 @@ class StreamView {
 			if (maxHeight > 0) {
 				const chat = this._popouts.get(StreamViewOptions.PopoutIdentifiers.CHAT);
 				if (chat && chat.element.length > 0) {
+					// Workaround for core refusing to update height if it was initially `auto`
+					chat.options.height = maxHeight;
 					chat.setPosition({height: maxHeight});
 					chat.scrollBottom();
 				}
