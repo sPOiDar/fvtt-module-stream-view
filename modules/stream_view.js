@@ -1651,6 +1651,9 @@ class StreamView {
 		Hooks.on('renderApplication', (app, html) => this._handlePopout(app, html));
 		Hooks.on('renderItemSheet', (app, html) => this._handlePopout(app, html));
 		Hooks.on('renderActorSheet', (app, html) => this._handlePopout(app, html));
+		Hooks.on('refreshAmbientSound', (_, options) => {
+			if (options.refreshState) this.focusUpdate();
+		});
 
 		if (game.settings.get('core', 'chatBubblesPan')) {
 			game.settings.set('core', 'chatBubblesPan', false);
