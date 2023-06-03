@@ -1,3 +1,13 @@
+## [1.7.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.2...v1.7.3) (2023-06-03)
+
+
+### Bug Fixes
+
+* **audio:** Update ambient audio playback on audio state change ([8c22620](https://github.com/sPOiDar/fvtt-module-stream-view/commit/8c22620)), closes [#64](https://github.com/sPOiDar/fvtt-module-stream-view/issues/64)
+
+
+
+
 ## [1.7.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.1...v1.7.2) (2023-05-29)
 
 
