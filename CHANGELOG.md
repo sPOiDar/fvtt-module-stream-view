@@ -1,3 +1,13 @@
+## [1.7.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.3...v1.7.4) (2023-06-03)
+
+
+### Bug Fixes
+
+* **audio:** Trigger update for any ambient sound change ([950de74](https://github.com/sPOiDar/fvtt-module-stream-view/commit/950de74)), closes [#64](https://github.com/sPOiDar/fvtt-module-stream-view/issues/64)
+
+
+
+
 ## [1.7.3](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.2...v1.7.3) (2023-06-03)
 
 
