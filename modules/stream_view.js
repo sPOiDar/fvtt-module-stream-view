@@ -138,6 +138,16 @@ class StreamView {
 			type: Boolean,
 		});
 
+		game.settings.register('stream-view', 'gm-track-controlled', {
+			name: game.i18n.localize('stream-view.settings.gm-track-controlled.name'),
+			hint: game.i18n.localize('stream-view.settings.gm-track-controlled.hint'),
+			scope: 'world',
+			config: true,
+			restricted: true,
+			default: false,
+			type: Boolean,
+		});
+
 		game.settings.register('stream-view', 'maximum-scale', {
 			name: game.i18n.localize('stream-view.settings.maximum-scale.name'),
 			hint: game.i18n.localize('stream-view.settings.maximum-scale.hint'),
@@ -714,7 +724,7 @@ class StreamView {
 		this._cameraModeLast = StreamViewOptions.CameraMode.AUTOMATIC;
 		this._speakerHistory = new Map();
 		this._popouts = new Map();
-		this._controlledTokenId = null;
+		this._controlledTokenIDs = new Set();
 		this._sceneId = null;
 		this._debounceAnimateTo = foundry.utils.debounce(this.animateTo.bind(this), 100);
 		this._notesStatus = false;
@@ -1006,7 +1016,10 @@ class StreamView {
 		}
 		let tokenId;
 		try {
-			tokenId = await this._socket.executeAsUser('controlledToken', userId);
+			tokenIDs = await this._socket.executeAsUser('controlledTokens', userId);
+			if (tokenIDs.length > 0) {
+				tokenId = tokenIDs[tokenIDs.length - 1];
+			}
 		} catch {
 			return null;
 		}
@@ -1083,16 +1096,39 @@ class StreamView {
 		this.focusUpdate();
 	}
 
-	_controlledTokenUpdate(token, controlled) {
+	async _controlledTokenUpdate(token, controlled) {
 		if (controlled) {
-			this._controlledTokenId = token.id;
-			return;
+			this._controlledTokenIDs.add(token.id);
+		} else {
+			this._controlledTokenIDs.delete(token.id);
 		}
-		this._controlledTokenId = null;
+
+		if (game.user.isGM && game.settings.get('stream-view', 'gm-track-controlled')) {
+			try {
+				await this._socket.executeAsUser('controlToken', game.settings.get('stream-view', 'user-id'), token.id, controlled);
+			} catch {
+				return;
+			}
+		}
 	}
 
-	_controlledToken() {
-		return this._controlledTokenId;
+	_controlledTokens() {
+		return this._controlledTokenIDs;
+	}
+
+	async _controlToken(tokenId, controlled) {
+		if (!StreamView.isStreamUser) {
+			return;
+		}
+		const token = game.canvas.tokens.get(tokenId);
+		if (!token) {
+			return;
+		}
+		if (controlled) {
+			token.control({ releaseOthers: false });
+		} else {
+			token.release();
+		}
 	}
 
 	_addStreamControls(controls) {
@@ -1548,7 +1584,8 @@ class StreamView {
 
 	socketReady(socket) {
 		socket.register('connected', this._socketConnected.bind(this));
-		socket.register('controlledToken', this._controlledToken.bind(this));
+		socket.register('controlledTokens', this._controlledTokens.bind(this));
+		socket.register('controlToken', this._controlToken.bind(this));
 		socket.register('animateTo', this._debounceAnimateTo.bind(this));
 		socket.register('setCameraMode', this.setCameraMode.bind(this));
 		socket.register('closePopouts', this._closePopouts.bind(this));
@@ -1704,6 +1741,7 @@ class StreamView {
 			this.createPopout(StreamViewOptions.PopoutIdentifiers.CHAT, ui.sidebar.tabs.chat);
 		}
 
+		game.canvas.tokens.releaseAll();
 		this.focusUpdate();
 		this.updateCombat(StreamView.isCombatActive(game.combat), game.combat);
 	}
@@ -1831,7 +1869,7 @@ class StreamView {
 				if (chat && chat.element.length > 0) {
 					// Workaround for core refusing to update height if it was initially `auto`
 					chat.options.height = maxHeight;
-					chat.setPosition({height: maxHeight});
+					chat.setPosition({ height: maxHeight });
 					chat.scrollBottom();
 				}
 			}
@@ -1840,9 +1878,9 @@ class StreamView {
 			const chat = this._popouts.get(StreamViewOptions.PopoutIdentifiers.CHAT);
 			if (chat && chat.element.length > 0) {
 				if (maxHeight > 0) {
-					chat.setPosition({height: maxHeight});
+					chat.setPosition({ height: maxHeight });
 				} else {
-					chat.setPosition({height: 'auto'});
+					chat.setPosition({ height: 'auto' });
 				}
 				chat.scrollBottom();
 			}
