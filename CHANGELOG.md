@@ -1,3 +1,18 @@
+# [1.8.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.4...v1.8.0) (2023-06-09)
+
+
+### Bug Fixes
+
+* **translations:** Update a couple settings with Title Case ([8ae2a38](https://github.com/sPOiDar/fvtt-module-stream-view/commit/8ae2a38))
+
+
+### Features
+
+* **tokens:** Allow tracking of GM controlled tokens on stream ([431e35d](https://github.com/sPOiDar/fvtt-module-stream-view/commit/431e35d)), closes [#65](https://github.com/sPOiDar/fvtt-module-stream-view/issues/65)
+
+
+
+
 ## [1.7.4](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.3...v1.7.4) (2023-06-03)
 
 
