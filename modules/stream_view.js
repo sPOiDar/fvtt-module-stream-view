@@ -1,16 +1,13 @@
 import { SpeechBubbles } from './speech_bubbles.js';
 import { StreamViewLayer } from './layer.js';
 import { StreamViewOptions } from './options.js';
+import './types.js';
+
+const unknownUserId = 'unknownUser';
+const defaultUserChoices = { [unknownUserId]: '' };
+const tokenTrackedIcon = 'modules/stream-view/icons/video-solid.svg';
 
 class StreamView {
-	static _unknownUserId = 'unknownUser';
-	static _defaultUserChoices = { [this._unknownUserId]: '' };
-	static TOKEN_TRACKED_EFFECT = {
-		id: 'stream-view.token-tracked',
-		label: 'stream-view.controls.token-tracked',
-		icon: 'modules/stream-view/icons/video-solid.svg',
-	}
-
 	static start() {
 		const instance = new StreamView();
 		Hooks.once('init', () => this.init(instance));
@@ -48,6 +45,9 @@ class StreamView {
 		Hooks.once('ready', () => instance.ready());
 	}
 
+	/**
+	 * @param {StreamView} instance
+	 */
 	static init(instance) {
 		const mod = game.modules.get('stream-view');
 		mod.instance = instance;
@@ -65,8 +65,8 @@ class StreamView {
 			scope: 'world',
 			config: true,
 			restricted: true,
-			choices: this._defaultUserChoices,
-			default: this._unknownUserId,
+			choices: defaultUserChoices,
+			default: unknownUserId,
 			type: String,
 		});
 
@@ -633,18 +633,30 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @returns {boolean}
+	 */
 	static get isStreamUser() {
 		return game?.user?.id === game.settings.get('stream-view', 'user-id');
 	}
 
+	/**
+	 * @returns {User|null}
+	 */
 	static get streamUser() {
 		return game.users.get(game.settings.get('stream-view', 'user-id'));
 	}
 
+	/**
+	 * @param {JQuery<HTMLElement>} html
+	 */
 	static appendSpeechBubblesContainer(html) {
 		html.append(`<div id="${SpeechBubbles.containerId}"/>`);
 	}
 
+	/**
+	 * @param {JQuery<HTMLElement>} html
+	 */
 	static handleStreamAV(html) {
 		if (this.isStreamUser) {
 			if (!game.settings.get('stream-view', 'show-voice-video')) {
@@ -672,6 +684,9 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {JQuery<HTMLElement>} html
+	 */
 	static hideHtml(html) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -680,6 +695,9 @@ class StreamView {
 		html.hide();
 	}
 
+	/**
+	 * @param {JQuery<HTMLElement>} html
+	 */
 	static hidePopoutHeaders(html) {
 		if (!game.settings.get('stream-view', 'hide-popout-headers')) {
 			return;
@@ -687,6 +705,9 @@ class StreamView {
 		html.children('header.window-header').hide();
 	}
 
+	/**
+	 * @param {Application} app
+	 */
 	static setPopoutPosition(app) {
 		if (!game.settings.get('stream-view', 'popout-position-fixed')) {
 			return;
@@ -706,6 +727,10 @@ class StreamView {
 		app.setPosition(options);
 	}
 
+	/**
+	 * @param {Combat} combat
+	 * @returns {boolean}
+	 */
 	static isCombatActive(combat) {
 		return combat?.current?.round > 0;
 	}
@@ -718,19 +743,56 @@ class StreamView {
 	}
 
 	constructor() {
+		/**
+		 * @type {SpeechBubbles}
+		 */
 		this._speechBubbles = new SpeechBubbles();
-		this._socket = undefined;
+		/**
+		 * @type {Socketlib|null}
+		 */
+		this._socket = null;
+		/**
+		 * @type {string}
+		 */
 		this._cameraMode = StreamViewOptions.CameraMode.AUTOMATIC;
+		/**
+		 * @type {string}
+		 */
 		this._cameraModeLast = StreamViewOptions.CameraMode.AUTOMATIC;
+		/**
+		 * @type {Map<string, SpeakerHistory>}
+		 */
 		this._speakerHistory = new Map();
+		/**
+		 * @type {Map}
+		 */
 		this._popouts = new Map();
+		/**
+		 * @type {Set<string>}
+		 */
 		this._controlledTokenIDs = new Set();
+		/**
+		 * @type {string|null}
+		 */
 		this._sceneId = null;
+		/**
+		 * @type {Function}
+		 */
 		this._debounceAnimateTo = foundry.utils.debounce(this.animateTo.bind(this), 100);
+		/**
+		 * @type {boolean}
+		 */
 		this._notesStatus = false;
-		this._trackedTokens = {};
+		/**
+		 * @type {Map<string, Set<string>>}
+		 */
+		this._trackedTokens = new Map();
 	}
 
+	/**
+	 * @param {Coord[]} [coords=[]]
+	 * @returns {Coord}
+	 */
 	_coordBounds(coords = []) {
 		if (coords.length === 0) {
 			return { x: canvas.stage.pivot.x, y: canvas.stage.pivot.y, scale: canvas.stage.scale.x };
@@ -794,6 +856,9 @@ class StreamView {
 		return { x, y, scale };
 	}
 
+	/**
+	 * @returns {boolean}
+	 */
 	get _isCombatUser() {
 		if (!this._combatActive) {
 			return false;
@@ -810,6 +875,9 @@ class StreamView {
 		return false;
 	}
 
+	/**
+	 * @returns {boolean}
+	 */
 	get _isCameraAutomatic() {
 		return (
 			this._cameraMode === StreamViewOptions.CameraMode.AUTOMATIC &&
@@ -817,6 +885,9 @@ class StreamView {
 		);
 	}
 
+	/**
+	 * @returns {boolean}
+	 */
 	get _isCameraDirected() {
 		return (
 			this._cameraMode === StreamViewOptions.CameraMode.DIRECTED ||
@@ -824,6 +895,9 @@ class StreamView {
 		);
 	}
 
+	/**
+	 * @returns {boolean}
+	 */
 	get _isCameraDisabled() {
 		return (
 			this._cameraMode === StreamViewOptions.CameraMode.DISABLED &&
@@ -831,6 +905,9 @@ class StreamView {
 		);
 	}
 
+	/**
+	 * @param {Coord} view
+	 */
 	_directedPan(view) {
 		if (StreamView.isStreamUser) {
 			return;
@@ -847,6 +924,9 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {Coord} view
+	 */
 	async _sendDirectedPan(view) {
 		if (!this._isCameraDirected) {
 			return;
@@ -866,6 +946,9 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @returns {Token[]}
+	 */
 	_playerTokens() {
 		const tokens = [];
 
@@ -877,6 +960,9 @@ class StreamView {
 		return tokens;
 	}
 
+	/**
+	 * @returns {Token[]}
+	 */
 	_speakingTokens() {
 		const tokens = [];
 		if (!game.settings.get('stream-view', 'pan-on-user-speaking')) {
@@ -894,6 +980,9 @@ class StreamView {
 		return tokens;
 	}
 
+	/**
+	 * @returns {Token[]}
+	 */
 	_combatPlayerTokens(combatant) {
 		let targets = [];
 		canvas.tokens.placeables.forEach((t) => {
@@ -908,6 +997,9 @@ class StreamView {
 		return targets;
 	}
 
+	/**
+	 * @returns {Token[]}
+	 */
 	_combatGMTokens() {
 		let targets = [];
 		game.users
@@ -922,6 +1014,10 @@ class StreamView {
 		return targets;
 	}
 
+	/**
+	 * @param {Combat} combat
+	 * @returns {Token[]}
+	 */
 	_visibleCombatTokens(combat) {
 		const combatant = combat?.combatant;
 		if (!combatant) {
@@ -942,6 +1038,10 @@ class StreamView {
 		return targets;
 	}
 
+	/**
+	 * @param {Combat} combat
+	 * @returns {MeasuredTemplate[]}
+	 */
 	_combatMeasuredTemplates(combat) {
 		const combatant = combat?.combatant;
 		if (!combatant) {
@@ -961,6 +1061,10 @@ class StreamView {
 		return templates;
 	}
 
+	/**
+	 * @param {Token[]} tokens
+	 * @returns {Coord[]}
+	 */
 	_tokenCoords(tokens) {
 		const coords = [];
 		tokens.forEach((t) => {
@@ -971,6 +1075,10 @@ class StreamView {
 		return coords;
 	}
 
+	/**
+	 * @param {Template[]} templates
+	 * @returns {Coord[]}
+	 */
 	_measuredTemplateCoords(templates) {
 		const coords = [];
 		templates.forEach((t) => {
@@ -986,6 +1094,10 @@ class StreamView {
 		return coords;
 	}
 
+	/**
+	 * @param {Token} token
+	 * @returns {boolean}
+	 */
 	_isChatting(token) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1010,6 +1122,10 @@ class StreamView {
 		setTimeout(() => this._speakingUpdate(user.id, wasSpeaking, token), 1);
 	}
 
+	/**
+	 * @param {string} userId
+	 * @returns {Token}
+	 */
 	async _tokenForGM(userId) {
 		if (!this._socket) {
 			return null;
@@ -1029,6 +1145,11 @@ class StreamView {
 		return game.canvas.tokens.get(tokenId);
 	}
 
+	/**
+	 * @param {string} userId
+	 * @param {boolean} isSpeaking
+	 * @returns {Token}
+	 */
 	async _tokenForSpeaker(userId, isSpeaking) {
 		const user = game.users.get(userId);
 		if (!user) {
@@ -1053,6 +1174,11 @@ class StreamView {
 		return token;
 	}
 
+	/**
+	 * @param {Token} token
+	 * @param {boolean} isSpeaking
+	 * @returns {Promise<void>}
+	 */
 	async _bubblesUpdate(token, isSpeaking) {
 		if (!token || !game.settings.get('stream-view', 'show-speech-bubbles')) {
 			return;
@@ -1065,6 +1191,11 @@ class StreamView {
 		return this._speechBubbles.show(token);
 	}
 
+	/**
+	 * @param {string} userId
+	 * @param {boolean} isSpeaking
+	 * @param {Token} token
+	 */
 	async _speakingUpdate(userId, isSpeaking, token) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1096,6 +1227,10 @@ class StreamView {
 		this.focusUpdate();
 	}
 
+	/**
+	 * @param {Token} token
+	 * @param {boolean} controlled
+	 */
 	async _controlledTokenUpdate(token, controlled) {
 		if (controlled) {
 			this._controlledTokenIDs.add(token.id);
@@ -1112,10 +1247,17 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @returns {Token[]}
+	 */
 	_controlledTokens() {
 		return this._controlledTokenIDs;
 	}
 
+	/**
+	 * @param {string} tokenId
+	 * @param {boolean} controlled
+	 */
 	async _controlToken(tokenId, controlled) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1131,6 +1273,9 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {SceneControl[]} controls
+	 */
 	_addStreamControls(controls) {
 		const control = {
 			name: 'stream-view',
@@ -1210,10 +1355,16 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @returns {boolean}
+	 */
 	_getNotesStatus() {
 		return game.settings.get("core", NotesLayer.TOGGLE_SETTING)
 	}
 
+	/**
+	 * @param {boolean} toggled
+	 */
 	async _sendToggleNotes(toggled) {
 		try {
 			this._notesStatus = await this._socket.executeAsUser(
@@ -1227,6 +1378,10 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {boolean} toggled
+	 * @returns {boolean}
+	 */
 	_toggleNotes(toggled) {
 		const currentLayer = canvas.activeLayer.options.name;
 		canvas[NotesLayer.layerOptions.name]?.activate();
@@ -1268,6 +1423,9 @@ class StreamView {
 		await this.setCameraMode(targetMode);
 	}
 
+	/**
+	 * @param {string} mode
+	 */
 	async setCameraMode(mode) {
 		if (!game.user.isGM && !StreamView.isStreamUser) {
 			return;
@@ -1287,6 +1445,9 @@ class StreamView {
 		await this._setGMCameraMode(mode);
 	}
 
+	/**
+	 * @returns {Coord}
+	 */
 	_getInitialViewport() {
 		let { x, y, scale } = game.scenes.get(this._sceneId).initial;
 		const r = game.canvas.dimensions.rect;
@@ -1296,6 +1457,9 @@ class StreamView {
 		return { x, y, scale };
 	}
 
+	/**
+	 * @param {string} mode
+	 */
 	async _setGMCameraMode(mode) {
 		if (!game.user.isGM || !this._socket) {
 			return;
@@ -1324,6 +1488,9 @@ class StreamView {
 		);
 	}
 
+	/**
+	 * @param {LayerPreview} view
+	 */
 	_previewCamera({ x, y, width, height }) {
 		if (!game.user.isGM) {
 			return;
@@ -1333,18 +1500,24 @@ class StreamView {
 	}
 
 	clearTrackedTokens() {
-		this._trackedTokens[this._sceneId].forEach((t) => {
+		this._trackedTokens.get(this._sceneId).forEach((t) => {
 			const token = game.canvas.tokens.get(t);
 			this._toggleTokenTracking(token, false);
 		});
 		ui.notifications.info('Stream View tracked tokens cleared');
 	}
 
+	/**
+	 * @param {TokenDocument} doc
+	 */
 	_handleCreateToken(doc) {
 		if (StreamView.isStreamUser && game.canvas.tokens.get(doc.id))
 			this.focusUpdate();
 	}
 
+	/**
+	 * @param {Token} token
+	 */
 	_handleDrawToken(token) {
 		if (!game.user?.isGM) {
 			return;
@@ -1353,6 +1526,9 @@ class StreamView {
 		token._streamViewContainer ||= token.addChild(new PIXI.Container());
 	}
 
+	/**
+	 * @param {TokenDocument} doc
+	 */
 	_handleUpdateToken(doc) {
 		if (!StreamView.isStreamUser && !game.user?.isGM) {
 			return;
@@ -1366,9 +1542,9 @@ class StreamView {
 		}
 
 		if (this._tokenDocumentHasTracking(doc)) {
-			this._trackedTokens[this._sceneId].add(doc.id);
+			this._trackedTokens.get(this._sceneId).add(doc.id);
 		} else {
-			this._trackedTokens[this._sceneId].delete(doc.id);
+			this._trackedTokens.get(this._sceneId).delete(doc.id);
 		}
 
 		if (StreamView.isStreamUser) {
@@ -1376,21 +1552,31 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {Token} token
+	 */
 	_handleDeleteToken(token) {
 		if (!StreamView.isStreamUser && !game.user?.isGM) {
 			return;
 		}
 
-		this._trackedTokens[this._sceneId].delete(token.id);
+		this._trackedTokens.get(this._sceneId).delete(token.id);
 		if (StreamView.isStreamUser) {
 			this.focusUpdate();
 		}
 	}
 
+	/**
+	 * @param {TokenDocument} doc
+	 */
 	_tokenDocumentHasTracking(doc) {
 		return !!doc.getFlag('stream-view', 'tracked');
 	}
 
+	/**
+	 * @param {Token} token
+	 * @param {boolean} active
+	 */
 	async _toggleTokenTrackedIcon(token, active) {
 		if (!game.user?.isGM) {
 			return;
@@ -1400,7 +1586,7 @@ class StreamView {
 		token._streamViewContainer.removeChildren().forEach((c) => c.destroy());
 		if (active) {
 			const w = Math.round(canvas.dimensions.size / 2 / 4) * 2;
-			const tex = await loadTexture(StreamView.TOKEN_TRACKED_EFFECT.icon, { fallback: "icons/svg/hazard.svg" });
+			const tex = await loadTexture(tokenTrackedIcon, { fallback: "icons/svg/hazard.svg" });
 			const icon = new PIXI.Sprite(tex);
 			icon.width = icon.height = w;
 			icon.x = token.w - w;
@@ -1409,6 +1595,10 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {Token} token
+	 * @param {boolean} active
+	 */
 	_toggleTokenTracking(token, active) {
 		if (!token || !game.user?.isGM) {
 			return;
@@ -1421,10 +1611,17 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {boolean} active
+	 */
 	_toggleControlledTokenTracking(active) {
 		game.canvas.tokens.controlled.forEach((t) => this._toggleTokenTracking(t, active));
 	}
 
+	/**
+	 * @param {JQuery<HTMLElement>} html
+	 * @param {TokenHUD} tokenHUD
+	 */
 	_handleTokenHUD(html, tokenHUD) {
 		if (game.settings.get('stream-view', 'disable-manually-tracked-tokens') || !game.user?.isGM) {
 			return;
@@ -1436,7 +1633,7 @@ class StreamView {
 			const title = game.i18n.localize('stream-view.controls.token-track-toggle');
 			let isActive = this._tokenDocumentHasTracking(token.document);
 			const icon = $(`<div class="control-icon ${isActive ? 'active' : ''}"><i title="${title}" class="fas fa-video"></i></div>`);
-			icon.click(() => {
+			icon.on('click', () => {
 				this._toggleControlledTokenTracking(!this._tokenDocumentHasTracking(token.document));
 				icon.toggleClass('active');
 			});
@@ -1444,6 +1641,10 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {Application} app
+	 * @param {JQuery<HTMLElement>} html
+	 */
 	_handlePopout(app, html) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1505,7 +1706,10 @@ class StreamView {
 		}
 	}
 
-	_defaultPadding(combat = false) {
+	/**
+	 * @param {boolean} [inCombat=false]
+	 */
+	_defaultPadding(inCombat = false) {
 		const padding = {
 			top: 0,
 			right: 0,
@@ -1548,7 +1752,7 @@ class StreamView {
 			}
 		}
 
-		if (combat && game.settings.get('stream-view', 'auto-show-combat')) {
+		if (inCombat && game.settings.get('stream-view', 'auto-show-combat')) {
 			const combatpixels = game.settings.get('stream-view', 'combat-position-x');
 			if (combatpixels < 0) {
 				if (chatpixels < 0 && combatpixels < chatpixels) {
@@ -1568,6 +1772,9 @@ class StreamView {
 		return padding;
 	}
 
+	/**
+	 * @param {Coord} view
+	 */
 	async _sendCameraPreview({ x, y, scale }) {
 		const width = window.innerWidth / scale;
 		const height = window.innerHeight / scale;
@@ -1576,12 +1783,18 @@ class StreamView {
 		this._socket.executeForAllGMs('previewCamera', { x: px, y: py, width, height });
 	}
 
+	/**
+	 * @param {string} userId
+	 */
 	_socketConnected(userId) {
 		if (userId === game.settings.get('stream-view', 'user-id')) {
 			this._sendGetNotesStatus();
 		}
 	}
 
+	/**
+	 * @param {Socketlib} socket
+	 */
 	socketReady(socket) {
 		socket.register('connected', this._socketConnected.bind(this));
 		socket.register('controlledTokens', this._controlledTokens.bind(this));
@@ -1623,14 +1836,15 @@ class StreamView {
 		}
 
 		// Hack around needing to register settings in init, when data is not yet available.
+		const userChoices = {};
 		game.users.forEach((u) => {
 			// Do not offer GM users as Stream View candidates
 			if (u.isGM) {
 				return;
 			}
-			StreamView._defaultUserChoices[u.id] = u.name;
+			userChoices[u.id] = u.name;
 		});
-		game.settings.settings.get('stream-view.user-id').choices = StreamView._defaultUserChoices;
+		game.settings.settings.get('stream-view.user-id').choices = foundry.utils.mergeObject(defaultUserChoices, userChoices);
 		const defaultPadding = this._defaultPadding(false);
 		const defaultCombatPadding = this._defaultPadding(true);
 		game.settings.settings.get('stream-view.padding-left').default = defaultPadding.left;
@@ -1746,6 +1960,10 @@ class StreamView {
 		this.updateCombat(StreamView.isCombatActive(game.combat), game.combat);
 	}
 
+	/**
+	 * @param {string} identifier
+	 * @returns {PopoutOptions}
+	 */
 	_popoutOptions(identifier) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1771,6 +1989,10 @@ class StreamView {
 		return options;
 	}
 
+	/**
+	 * @param {string} identifier
+	 * @param {Application} app
+	 */
 	createPopout(identifier, app) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1788,6 +2010,9 @@ class StreamView {
 		});
 	}
 
+	/**
+	 * @param {string} identifier
+	 */
 	async closePopout(identifier) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1801,6 +2026,9 @@ class StreamView {
 		await popout.close();
 	}
 
+	/**
+	 * @param {Coord} view
+	 */
 	async animateTo({ x, y, scale }) {
 		if (!StreamView.isStreamUser) {
 			return;
@@ -1831,12 +2059,12 @@ class StreamView {
 		if (!StreamView.isStreamUser && !game.user.isGM) {
 			return;
 		}
-		if (!this._trackedTokens[this._sceneId]) {
-			this._trackedTokens[this._sceneId] = new Set();
+		if (!this._trackedTokens.get(this._sceneId)) {
+			this._trackedTokens.set(this._sceneId, new Set());
 		}
 		game.canvas.tokens.placeables.forEach((t) => {
 			if (this._tokenDocumentHasTracking(t.document)) {
-				this._trackedTokens[this._sceneId].add(t.id);
+				this._trackedTokens.get(this._sceneId).add(t.id);
 				this._toggleTokenTrackedIcon(t, true);
 			}
 		});
@@ -1847,6 +2075,10 @@ class StreamView {
 		}
 	}
 
+	/**
+	 * @param {boolean} active
+	 * @param {Combat} combat
+	 */
 	updateCombat(active, combat) {
 		this._combatActive = !!active;
 
@@ -1916,8 +2148,8 @@ class StreamView {
 		}
 
 		let tokens = [];
-		if (this._trackedTokens[this._sceneId]?.size > 0) {
-			this._trackedTokens[this._sceneId].forEach((id) => {
+		if (this._trackedTokens.get(this._sceneId)?.size > 0) {
+			this._trackedTokens.get(this._sceneId).forEach((id) => {
 				const token = game.canvas.tokens.get(id);
 				if (token) {
 					tokens.push(token);
@@ -1935,6 +2167,9 @@ class StreamView {
 		this.animateTo(this._coordBounds(this._tokenCoords(tokens)));
 	}
 
+	/**
+	 * @param {Combat} combat
+	 */
 	async _combatTokens(combat) {
 		const p = new Promise((resolve) => {
 			let released = 0;
@@ -1953,6 +2188,9 @@ class StreamView {
 		return p;
 	}
 
+	/**
+	 * @param {Combat} combat
+	 */
 	async focusCombat(combat) {
 		if (!StreamView.isStreamUser) {
 			return;

@@ -1,8 +1,12 @@
 import { StreamViewOptions } from './options.js';
+import './types.js';
 
 export class StreamViewLayer extends InteractionLayer {
 	constructor() {
 		super();
+		/**
+		 * @type {LayerPreview}
+		 */
 		this._previewData = {
 			x: 0,
 			y: 0,
@@ -27,6 +31,9 @@ export class StreamViewLayer extends InteractionLayer {
 		this._preview ||= this.addChild(new PIXI.Graphics());
 	}
 
+	/**
+	 * @param {LayerPreview} view
+	 */
 	_drawPreview({ x, y, width, height }) {
 		this._preview.clear();
 		const previewMode = game.settings.get('stream-view', 'preview-display');
@@ -74,6 +81,9 @@ export class StreamViewLayer extends InteractionLayer {
 		this._drawPreview(this._previewData);
 	}
 
+	/**
+	 * @param {LayerPreview} view
+	 */
 	drawPreview({ x, y, width, height }) {
 		this._previewData = { x, y, width, height };
 		this._drawPreview({ x, y, width, height });

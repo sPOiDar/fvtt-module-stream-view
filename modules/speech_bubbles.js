@@ -14,7 +14,7 @@ export class SpeechBubbles {
 
   /**
    * A reference to the speech bubbles HTML container in which rendered bubbles should live
-   * @return {jQuery}
+   * @returns {jQuery}
    */
   get container() {
     return $(`#${SpeechBubbles.containerId}`);
@@ -37,7 +37,7 @@ export class SpeechBubbles {
     let html = $(await this._renderHTML({ token }));
 
     // Set initial dimensions
-    this._setPosition(token, html, { width: 32, height: 32 });
+    this.#setPosition(token, html, { width: 32, height: 32 });
 
     // Append to DOM
     this.container.append(html);
@@ -71,7 +71,7 @@ export class SpeechBubbles {
   /**
    * Render the HTML template for the speech bubble
    * @param {Object} data         Template data
-   * @return {Promise<string>}    The rendered HTML
+   * @returns {Promise<string>}    The rendered HTML
    * @private
    */
   async _renderHTML(data) {
@@ -84,9 +84,11 @@ export class SpeechBubbles {
 
   /**
    * Assign styling parameters to the speech bubble, toggling either a left or right display (randomly)
-   * @private
+   * @param {Token} token 
+   * @param {jQuery} html 
+   * @param {Dimensions} dimensions 
    */
-  _setPosition(token, html, dimensions) {
+  #setPosition(token, html, dimensions) {
     const pos = {
       height: dimensions.height,
       width: dimensions.width,
