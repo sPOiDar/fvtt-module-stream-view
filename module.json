@@ -18,7 +18,7 @@
     "maximum": "11"
   },
   "esmodules": [
-    "modules/stream_view.js"
+    "modules/init.js"
   ],
   "styles": [
     "styles/stream_view.css"

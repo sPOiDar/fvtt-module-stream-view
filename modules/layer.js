@@ -2,18 +2,24 @@ import { StreamViewOptions } from './options.js';
 import './types.js';
 
 export class StreamViewLayer extends InteractionLayer {
+	/**
+	 * @type {LayerPreview}
+	 */
+	#previewData = {
+		x: 0,
+		y: 0,
+		width: 0,
+		height: 0,
+	}
+
+	/**
+	 * @type {PIXI.DisplayObject|null}
+	 */
+	#preview = null;
+
 	constructor() {
 		super();
-		/**
-		 * @type {LayerPreview}
-		 */
-		this._previewData = {
-			x: 0,
-			y: 0,
-			width: 0,
-			height: 0,
-		}
-		this._createPreview();
+		this.#createPreview();
 	}
 
 	static documentName = 'StreamViewLayer';
@@ -27,20 +33,24 @@ export class StreamViewLayer extends InteractionLayer {
 		});
 	}
 
-	_createPreview() {
-		this._preview ||= this.addChild(new PIXI.Graphics());
+	/**
+	 * @private
+	 */
+	#createPreview() {
+		this.#preview ||= this.addChild(new PIXI.Graphics());
 	}
 
 	/**
 	 * @param {LayerPreview} view
+	 * @private
 	 */
-	_drawPreview({ x, y, width, height }) {
-		this._preview.clear();
+	#drawPreview({ x, y, width, height }) {
+		this.#preview.clear();
 		const previewMode = game.settings.get('stream-view', 'preview-display');
 		if (previewMode === StreamViewOptions.PreviewDisplay.NEVER || (previewMode === StreamViewOptions.PreviewDisplay.LAYER && !this.active)) {
 			return;
 		}
-		this._preview.beginFill(0x0000dd, 0.05)
+		this.#preview.beginFill(0x0000dd, 0.05)
 			.lineStyle({ color: 0x0000dd, alpha: 0.2, width: 1 })
 			.drawRect(x, y, width, height)
 			.endFill();
@@ -49,15 +59,15 @@ export class StreamViewLayer extends InteractionLayer {
 	/** @override */
 	async _draw(options) {
 		this.interactiveChildren = false;
-		this._createPreview()
+		this.#createPreview()
 	}
 
 	/** @override */
 	async _tearDown(options) {
-		if (this._preview) {
-			this._preview.clear();
+		if (this.#preview) {
+			this.#preview.clear();
 		}
-		this._preview = undefined;
+		this.#preview = undefined;
 		super._tearDown(options);
 	}
 
@@ -65,27 +75,27 @@ export class StreamViewLayer extends InteractionLayer {
 	_activate() {
 		super._activate();
 		if (game.settings.get('stream-view', 'preview-display') === StreamViewOptions.PreviewDisplay.LAYER) {
-			this._drawPreview(this._previewData);
+			this.#drawPreview(this.#previewData);
 		}
 	}
 
 	/** @override */
 	_deactivate() {
 		if (game.settings.get('stream-view', 'preview-display') === StreamViewOptions.PreviewDisplay.LAYER) {
-			this._preview.clear();
+			this.#preview.clear();
 		}
 		super._deactivate();
 	}
 
 	refresh() {
-		this._drawPreview(this._previewData);
+		this.#drawPreview(this.#previewData);
 	}
 
 	/**
 	 * @param {LayerPreview} view
 	 */
 	drawPreview({ x, y, width, height }) {
-		this._previewData = { x, y, width, height };
-		this._drawPreview({ x, y, width, height });
+		this.#previewData = { x, y, width, height };
+		this.#drawPreview({ x, y, width, height });
 	}
 }
