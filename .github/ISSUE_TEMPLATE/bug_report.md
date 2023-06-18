@@ -20,6 +20,9 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
+**JavaScript Errors**
+If there are any errors in your browser JavaScript console (press F12), please post them here.
+
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
