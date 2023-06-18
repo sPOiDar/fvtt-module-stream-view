@@ -1,3 +1,13 @@
+## [2.0.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v2.0.0...v2.0.1) (2023-06-18)
+
+
+### Bug Fixes
+
+* **core:** Hack around Foundry v10 initialiazing users very late. ([8a76cdb](https://github.com/sPOiDar/fvtt-module-stream-view/commit/8a76cdb)), closes [#66](https://github.com/sPOiDar/fvtt-module-stream-view/issues/66)
+
+
+
+
 # [2.0.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.8.0...v2.0.0) (2023-06-18)
 
 
