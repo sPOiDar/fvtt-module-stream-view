@@ -1,3 +1,19 @@
+# [2.0.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.8.0...v2.0.0) (2023-06-18)
+
+
+### Code Refactoring
+
+* **core:** Refactor the code to split functionality by user class ([6fd6d02](https://github.com/sPOiDar/fvtt-module-stream-view/commit/6fd6d02))
+
+
+### BREAKING CHANGES
+
+* **core:** Direct consumers of the module code are likely to experience breakage,
+however the majority of the public API should remain intact.
+
+
+
+
 # [1.8.0](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v1.7.4...v1.8.0) (2023-06-09)
 
 
