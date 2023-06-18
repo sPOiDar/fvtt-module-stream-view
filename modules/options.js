@@ -608,7 +608,7 @@ export class StreamViewOptions {
 	/**
 	 * @param {StreamView} instance 
 	 */
-	static setup(instance) {
+	static ready(instance) {
 		// Hack around needing to register settings in init, when data is not yet available.
 		const userChoices = {};
 		game.users.forEach((u) => {
