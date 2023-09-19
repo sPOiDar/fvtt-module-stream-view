@@ -1,3 +1,13 @@
+## [2.0.2](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v2.0.1...v2.0.2) (2023-09-19)
+
+
+### Bug Fixes
+
+* **camera:** Ensure that directed combat takes precedence over GM camera ([3ac30a8](https://github.com/sPOiDar/fvtt-module-stream-view/commit/3ac30a8))
+
+
+
+
 ## [2.0.1](https://github.com/sPOiDar/fvtt-module-stream-view/compare/v2.0.0...v2.0.1) (2023-06-18)
 
 
