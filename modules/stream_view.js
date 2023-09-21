@@ -136,8 +136,10 @@ export class StreamView {
 		if (!this.isCameraDirected || StreamView.streamUser?.viewedScene !== game.canvas.scene.id) {
 			return;
 		}
-		if (game.settings.get('stream-view', 'directed-combat') && this._isCombatUser) {
-			this.#sendDirectedPan(view);
+		if (game.combat?.active && game.settings.get('stream-view', 'directed-combat')) { 
+			if (this._isCombatUser) {
+				this.#sendDirectedPan(view);
+			}
 		} else if (game.user.isGM) {
 			this.#sendDirectedPan(view);
 		}
