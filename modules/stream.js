@@ -574,6 +574,7 @@ export class StreamViewStream extends StreamView {
 		} else {
 			token.release();
 		}
+		// jQuery('#visual-active-effects').css('display', 'none');
 	}
 
 	/**
