@@ -41,8 +41,21 @@ export class StreamView {
 	 * @param {Combat} combat
 	 * @returns {boolean}
 	 */
-	static isCombatActive(combat) {
+	static isCombatActive(combat = game.combat) {
 		return combat?.current?.round > 0;
+	}
+
+	/**
+	 * Check for player owner (omitting stream user)
+	 *
+	 * @param {Actor} actor
+	 * @returns {boolean}
+	 */
+	static hasPlayerOwner(actor) {
+		if (!actor) {
+			return false;
+		}
+		return game.users.some((u) => !u.isGM && u.id !== game.settings.get('stream-view', 'user-id') && actor.testUserPermission(u, "OWNER"));
 	}
 
 	/**
@@ -66,7 +79,7 @@ export class StreamView {
 	get isCameraAutomatic() {
 		return (
 			this.#cameraMode === StreamViewOptions.CameraMode.AUTOMATIC &&
-			!(game.combat?.active && game.settings.get('stream-view', 'directed-combat'))
+			!(StreamView.isCombatActive() && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
 
@@ -76,7 +89,7 @@ export class StreamView {
 	get isCameraDirected() {
 		return (
 			this.#cameraMode === StreamViewOptions.CameraMode.DIRECTED ||
-			(game.combat?.active && game.settings.get('stream-view', 'directed-combat'))
+			(StreamView.isCombatActive() && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
 
@@ -86,7 +99,7 @@ export class StreamView {
 	get isCameraDisabled() {
 		return (
 			this.#cameraMode === StreamViewOptions.CameraMode.DISABLED &&
-			!(game.combat?.active && game.settings.get('stream-view', 'directed-combat'))
+			!(StreamView.isCombatActive() && game.settings.get('stream-view', 'directed-combat'))
 		);
 	}
 
@@ -136,7 +149,7 @@ export class StreamView {
 		if (!this.isCameraDirected || StreamView.streamUser?.viewedScene !== game.canvas.scene.id) {
 			return;
 		}
-		if (game.combat?.active && game.settings.get('stream-view', 'directed-combat')) { 
+		if (StreamView.isCombatActive() && game.settings.get('stream-view', 'directed-combat')) { 
 			if (this._isCombatUser) {
 				this.#sendDirectedPan(view);
 			}
