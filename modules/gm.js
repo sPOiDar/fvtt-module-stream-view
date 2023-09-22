@@ -430,8 +430,9 @@ export class StreamViewGM extends StreamView {
 		if (!game.combat?.active) {
 			return false;
 		}
+		// If the current combatant has a player owner, allow GM control if the player is inactive
 		if (game.combat?.combatant?.actor?.hasPlayerOwner) {
-			return false;
+			return !game.users.some(u => u.active && !u.isGM && u.id !== game.settings.get('stream-view', 'user-id') && game.combat.combatant.actor.testUserPermission(u, "OWNER"));
 		}
 		return true;
 	}
