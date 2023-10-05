@@ -25,10 +25,10 @@ export class StreamViewPlayer extends StreamView {
 	 * @override
 	 */
 	get _isCombatUser() {
-		if (!game.combat?.active) {
+		if (!StreamView.isCombatActive()) {
 			return false;
 		}
-		if (game.combat?.combatant?.actor?.hasPlayerOwner) {
+		if (StreamView.hasPlayerOwner(game.combat?.combatant?.actor)) {
 			return game.combat.combatant.actor.testUserPermission(game.user, 'OWNER');
 		}
 		return false;

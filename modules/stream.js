@@ -186,7 +186,7 @@ export class StreamViewStream extends StreamView {
 		}
 
 		game.canvas.tokens.releaseAll();
-		this.#updateCombat(StreamView.isCombatActive(game.combat), game.combat);
+		this.#updateCombat(StreamView.isCombatActive(), game.combat);
 		this.#focusUpdate();
 
 	}
@@ -496,7 +496,7 @@ export class StreamViewStream extends StreamView {
 	 * @param {Combat} combat
 	 * @private
 	 */
-	async #focusCombat(combat) {
+	async #focusCombat(combat = game.combat) {
 		const tokens = await this.#combatTokens(combat);
 
 		if (game.settings.get('stream-view', 'select-combatant')) {
@@ -524,8 +524,8 @@ export class StreamViewStream extends StreamView {
 			return;
 		}
 
-		if (game.combat?.active) {
-			this.#focusCombat(game.combat);
+		if (StreamView.isCombatActive()) {
+			this.#focusCombat();
 			return;
 		}
 		this.#focusPlayers();
@@ -714,7 +714,7 @@ export class StreamViewStream extends StreamView {
 			return [];
 		}
 		const targets = [token];
-		if (combatant.hasPlayerOwner) {
+		if (StreamView.hasPlayerOwner(combatant.actor)) {
 			targets.push(...this.#combatPlayerTokens(combatant));
 		} else {
 			targets.push(...this.#combatGMTokens());
@@ -734,7 +734,7 @@ export class StreamViewStream extends StreamView {
 			return [];
 		}
 		let templates = [];
-		if (combatant.hasPlayerOwner) {
+		if (StreamView.hasPlayerOwner(combatant.actor)) {
 			canvas.templates.placeables.forEach((t) => {
 				combatant.players.forEach((p) => {
 					if (t.user === p.id) {
@@ -790,7 +790,7 @@ export class StreamViewStream extends StreamView {
 		const tokens = [];
 
 		game.canvas.tokens.placeables.forEach((t) => {
-			if (t.actor?.hasPlayerOwner) {
+			if (StreamView.hasPlayerOwner(t.actor)) {
 				tokens.push(t);
 			}
 		});
@@ -862,7 +862,7 @@ export class StreamViewStream extends StreamView {
 			token = await this.#tokenForGM(userId);
 		} else {
 			token = game.canvas.tokens.placeables.find(
-				(t) => t.actor?.hasPlayerOwner && user.character && t.actor.id === user.character.id,
+				(t) => StreamView.hasPlayerOwner(t.actor) && user.character && t.actor.id === user.character.id,
 			);
 		}
 		this.#bubblesUpdate(token, isSpeaking);
@@ -880,9 +880,9 @@ export class StreamViewStream extends StreamView {
 		}
 
 		let user;
-		if (token.actor?.hasPlayerOwner) {
+		if (StreamView.hasPlayerOwner(token.actor)) {
 			user = game.users.find((u) => {
-				if (u.isGM) {
+				if (u.isGM || u.id === game.settings.get('stream-view', 'user-id')) {
 					return false;
 				}
 				token.actor.testUserPermission(u, 'OWNER');

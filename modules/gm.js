@@ -427,13 +427,11 @@ export class StreamViewGM extends StreamView {
 	 * @override
 	 */
 	get _isCombatUser() {
-		if (!game.combat?.active) {
+		if (!StreamView.isCombatActive()) {
 			return false;
 		}
-		if (game.combat?.combatant?.actor?.hasPlayerOwner) {
-			return false;
-		}
-		return true;
+		// If the current combatant has a player owner, but the player is inactive, allow GM control
+		return !game.users.some((u) => u.active && !u.isGM && u.id !== game.settings.get('stream-view', 'user-id') && game.combat?.combatant?.actor?.testUserPermission(u, "OWNER"));
 	}
 
 	async toggleCameraMode() {
