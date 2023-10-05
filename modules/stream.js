@@ -311,7 +311,7 @@ export class StreamViewStream extends StreamView {
 	 * @param {JQuery<HTMLElement>} html
 	 * @private
 	 */
-	#handleRenderCameraViews() {
+	#handleRenderCameraViews(html) {
 		if (!game.settings.get('stream-view', 'show-voice-video')) {
 			this.#hideHtml(html);
 			return;
@@ -325,6 +325,7 @@ export class StreamViewStream extends StreamView {
 		} else {
 			html.css('width', pixels);
 		}
+		html.find(".control-bar").css("display", "none")
 	}
 
 	/**
@@ -573,6 +574,7 @@ export class StreamViewStream extends StreamView {
 		} else {
 			token.release();
 		}
+		// jQuery('#visual-active-effects').css('display', 'none');
 	}
 
 	/**
